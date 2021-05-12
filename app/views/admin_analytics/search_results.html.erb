@@ -1,0 +1,62 @@
+<div class="bg-blue-800 p-2 shadow text-xl text-white">
+    <h3 class="font-bold pl-2">Search Results for: <%= @search.zip %>, <%= @search.search_radius %> Radius, <%= @search.procedure_types %> and User discomfort - <%= @search.area_of_discomfort %> </h3>
+</div>
+<% if flash[:notice] %>
+<div class="notice">
+    <%= flash[:notice] %>
+</div>
+<% end %>
+<% if @search_results && @search_results.length > 0 %>
+<table class="table-fixed">
+    <thead>
+        <tr>
+            <th class="w-1/2 px-4 py-2">
+                Surgeon Name, Professional_Suffix
+            </th>
+			<th class="w-1/2 px-4 py-2">
+            	Website clicks?
+            </th>
+			<th class="w-1/2 px-4 py-2">
+            	Phone clicks?
+            </th>
+			<th class="w-1/2 px-4 py-2">
+            	Generate Report
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <% @search_results.each do |result| %>
+		<% surgeon = result.surgeon %>
+		<% location = surgeon.location %>
+		<% search = result.search %>
+		<% website_clicks = Link.where(search_id: search.id, surgeon_id: surgeon.id, link_type: "website") %>
+		<% phone_clicks = Link.where(search_id: search.id, surgeon_id: surgeon.id, link_type: "phone") %>
+		<tr>
+            <td class="border px-4 py-2">
+				<%= link_to "<span class='text-black underline'>#{surgeon.full_name}, #{surgeon.suffix}</span>".html_safe, surgeon_path(surgeon.id), class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white"  %>
+            </td>
+			<td class="border px-4 py-2">
+				<% if ( website_clicks && website_clicks.length > 0 ) %> <%= website_clicks.length %> <% else %> 0 <% end %>
+            </td>
+			<td class="border px-4 py-2">
+				<% if ( phone_clicks && phone_clicks.length > 0 ) %> <%= phone_clicks.length %> <% else %> 0 <% end %>
+            </td>
+            <td class="border px-4 py-2">
+				<%= link_to '<span class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded inline-flex items-center"><svg class="fill-current w-4 h-svg-dld mr-2 fl" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg><span class="fl">Download Report</span></span>'.html_safe, generate_report_path(surgeon_id: surgeon.id, format: :pdf), class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white"  %>
+			</td>
+				
+        </tr>
+        <% end %>
+    </tbody>
+</table>
+<div class="digg_pagination">
+    <div class="page_info">
+        <%= page_entries_info @search_results %>
+    </div>
+    <%= will_paginate @search_results, :container => false %>
+</div>
+<% else %>
+<p>
+    There are are no user searches done yet!
+</p>
+<% end %>

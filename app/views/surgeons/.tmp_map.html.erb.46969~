@@ -1,0 +1,31 @@
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    initMap(51.501564, -0.141944)
+});
+</script>
+<h1>Maps</h1>
+<div id='map'></div>
+<script>
+	function initMap(lat, lng) {
+    var myCoords = new google.maps.LatLng(lat, lng);
+    var mapOptions = {
+    center: myCoords,
+    zoom: 14
+    };
+    var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    var marker = new google.maps.Marker({
+        position: myCoords,
+        map: map
+    });
+	$.getJSON('/surgeons/map' + $(this).val(), function (data) {
+	var opt = '';
+	console.log(data);
+	data.forEach(function(i) {
+	opt += '';
+	location_city.html(opt);
+	});
+	});
+}
+
+
+</script>

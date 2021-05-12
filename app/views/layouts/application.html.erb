@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Locator</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag 'application', media: 'all' %>
+	<%= stylesheet_pack_tag 'application', media: 'all' %>
+    <%= javascript_pack_tag 'application' %>
+	<% if ( controller_name != "admin_analytics" && action_name != "generate_report" ) %>
+		<%= javascript_include_tag 'https://maps.googleapis.com/maps/api/js?key='+Rails.application.secrets.google_maps_api_key %>
+	<% end %>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+
+  </head>
+  <% unless ( controller_name == "admin_analytics" && ( action_name == "generate_report" || action_name == "client_reports" ) ) %>
+  <body class="bg-gray-900 font-sans leading-normal tracking-normal mt-12">
+	    <!--Nav-->
+    <nav class="bg-gray-900 pt-2 md:pt-1 pb-1 px-1 mt-0 h-auto fixed w-full z-20 top-0">
+
+        <div class="flex flex-wrap items-center">
+
+            <div class="flex flex-1 md:w-1/3 justify-center md:justify-start text-white px-2">
+                <span class="relative w-full">
+                    <div class="md:flex" style="padding: 10px;margin-left:20px;">
+			        	<div style="width: 100%;height: 10%;display:table;float: left;">
+			        		<img src="/assets/logo_rediscover.png" style="width: 300px;"/>
+						</div>
+					</div>
+                </span>
+			</div>
+
+			<div class="flex w-full pt-2 content-center justify-between md:w-1/3 md:justify-end">
+				<ul class="list-reset flex justify-between flex-1 md:flex-none items-center">
+				    <!-- <li class="flex-1 md:flex-none md:mr-3">
+					    <a class="inline-block py-2 px-4 text-white no-underline" href="#">Active</a>
+				    </li>
+				    <li class="flex-1 md:flex-none md:mr-3">
+					    <a class="inline-block text-gray-600 no-underline hover:text-gray-200 hover:text-underline py-2 px-4" href="#">link</a>
+				    </li> -->
+				    <li class="flex-1 md:flex-none md:mr-3">
+						<div class="relative inline-block">
+							<button onclick="toggleDD('myDropdown')" class="drop-button text-white focus:outline-none"> <span class="pr-2"><i class="em em-robot_face"></i></span>
+							<% if user_signed_in? %>
+	  							Hi, <%= current_user.email %>
+							<% else %>
+								Hi, User
+							<% end %>
+							<svg class="h-3 fill-current inline" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+							</button>
+                            <div id="myDropdown" class="dropdownlist absolute bg-gray-900 text-white right-0 mt-3 p-3 overflow-auto z-30 invisible" style="width: 100px;">
+                                <div class="border border-gray-800"></div>
+								<% if user_signed_in? %>
+                            		<%= link_to 'Edit Profile'.html_safe, edit_user_registration_path, class: "p-2 hover:bg-gray-800 text-white text-sm no-underline hover:no-underline block"  %>
+                            		<%= link_to 'Log Out'.html_safe, destroy_user_session_path, method: :delete, class: "p-2 hover:bg-gray-800 text-white text-sm no-underline hover:no-underline block"  %>
+								<% else %>
+                            		<%= link_to 'Sign In'.html_safe, new_user_session_path, class: "p-2 hover:bg-gray-800 text-white text-sm no-underline hover:no-underline block"  %>
+									<%= link_to 'Forgot Password?'.html_safe, new_password_path(resource_name), class: "p-2 hover:bg-gray-800 text-white text-sm no-underline hover:no-underline block"  %>
+								<% end %>
+							</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </nav>
+
+
+    <div class="flex flex-col md:flex-row">
+
+        <div class="bg-gray-900 shadow-lg h-16 fixed bottom-0 mt-12 md:relative md:h-screen z-10 w-full md:w-48">
+
+            <div class="md:mt-12 md:w-48 md:fixed md:left-0 md:top-0 content-center md:content-start text-left justify-between pad-30">
+                <ul class="list-reset flex flex-row md:flex-col py-0 md:py-3 px-1 md:px-2 text-center md:text-left">
+                	<% if current_user && current_user.admin?%>
+					<li class="mr-3 flex-1">
+                		<%= link_to '<i class="fas fa-tasks pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block">Dashboard</span>'.html_safe, dashboard_path, class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+                    </li>
+					<li class="mr-3 flex-1">
+                		<%= link_to '<i class="fas fa-user-plus pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block">Invite User</span>'.html_safe, new_user_invitation_path , class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+                    </li>
+					<li class="mr-3 flex-1">
+                		<%= link_to '<i class="fas fa-users pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block">All Users</span>'.html_safe, users_path , class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+                    </li>
+          <li class="mr-3 flex-1">
+                		<%= link_to '<i class="fas fa-user-times pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block">Reactivate Users</span>'.html_safe, reactive_users_path , class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+                    </li>
+					<% end %>
+					<% if user_signed_in? %>
+	                    <li class="mr-3 flex-1">
+	                		<%= link_to '<i class="fas fa-location-arrow pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block">All Locations</span>'.html_safe, locations_path, class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+	                    </li>
+					<% end %>
+					<% if current_user && current_user.admin?%>
+                    <li class="mr-3 flex-1">
+                		<%= link_to '<i class="fas fa-user-md pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block">All Surgeons</span>'.html_safe, surgeons_path, class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+                    </li>
+					<% end %>
+					<% if current_user && current_user.manager?%>
+	                    <li class="mr-3 flex-1">
+		                		<%= link_to '<i class="fas fa-user-md pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block">My Surgeons</span>'.html_safe, surgeons_path(:user_id => current_user.id), class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+	                    </li>
+					<% end %>
+					<% if current_user && ( (current_user.admin?) || (current_user.manager?)) %>
+						<li class="mr-3 flex-1">
+                			<%= link_to '<i class="fas fa-plus-square pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block">New Location</span>'.html_safe, new_location_path, class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+						</li>
+					<% end %>
+					<li class="mr-3 flex-1">
+						<% #if current_user && current_user.admin? %>
+                			<%#= link_to '<i class="fas fa-tasks pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block">Add New Surgeon</span>'.html_safe, new_surgeon_path, class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+
+						<% if current_user && current_user.manager? %>
+							<% @location = Location.find_by_user_id(current_user.id) %>
+							<% if @location %>
+                				<%= link_to '<i class="fas fa-plus-square pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block">New Surgeon</span>'.html_safe, new_surgeon_path(:location_id => @location.id), class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+							<% end %>
+						<% end %>
+
+					</li>
+					<li class="mr-3 flex-1">
+            			<%= link_to '<i class="fas fa-search-location pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block">Surgeon Locator</span>'.html_safe, search_surgeons_path, target: :_blank, class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+					</li>
+					<% if ( current_user && current_user.admin? ) %>
+          <li class="mr-3 flex-1">
+                    <%= link_to '<i class="fas fa-unlock pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block">Publish Surgeons</span>'.html_safe, activate_surgeons_path, class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+                    </li>
+          <li class="mr-3 flex-1">
+                    <%= link_to '<i class="fas fa-unlock pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block">Publish Locations</span>'.html_safe, activate_locations_path, class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+                    </li>
+						<li class="mr-3 flex-1">
+                			<%= link_to '<i class="fas fa-info-circle pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block">Analytics Data</span>'.html_safe, admin_analytics_path, class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+						</li>
+						<li class="mr-3 flex-1">
+							<%= link_to '<i class="fas fa-file-export pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block"><span class="fl">Export Database</span></span>'.html_safe, export_db_path(format: :xlsx), class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+						</li>
+						<li class="mr-3 flex-1">
+							<%= link_to '<i class="fas fa-file-download pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-600 md:text-gray-400 block md:inline-block"><span class="fl">Client Report</span></span>'.html_safe, client_reports_path(format: :pdf), class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500"  %>
+						</li>
+					<% end %>
+                </ul>
+            </div>
+
+
+        </div>
+		<div class="main-content flex-1 bg-gray-100 mt-12 pb-24 md:pb-5">
+            <div>
+				<%= yield %>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /*Toggle dropdown list*/
+        function toggleDD(myDropMenu) {
+            document.getElementById(myDropMenu).classList.toggle("invisible");
+        }
+        /*Filter dropdown options*/
+        function filterDD(myDropMenu, myDropMenuSearch) {
+            var input, filter, ul, li, a, i;
+            input = document.getElementById(myDropMenuSearch);
+            filter = input.value.toUpperCase();
+            div = document.getElementById(myDropMenu);
+            a = div.getElementsByTagName("a");
+            for (i = 0; i < a.length; i++) {
+                if (a[i].innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    a[i].style.display = "";
+                } else {
+                    a[i].style.display = "none";
+                }
+            }
+        }
+        // Close the dropdown menu if the user clicks outside of it
+        window.onclick = function(event) {
+            if (!event.target.matches('.drop-button') && !event.target.matches('.drop-search')) {
+                var dropdowns = document.getElementsByClassName("dropdownlist");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (!openDropdown.classList.contains('invisible')) {
+                        openDropdown.classList.add('invisible');
+                    }
+                }
+            }
+        }
+    </script>
+
+  </body>
+  <% else %>
+  <body>
+  	<%= yield %>
+  </body>
+  <% end %>
+</html>

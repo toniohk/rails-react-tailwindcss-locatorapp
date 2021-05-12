@@ -1,0 +1,89 @@
+    <div id="map"></div>
+    <script>
+
+      // This example requires the Visualization library. Include the libraries=visualization
+      // parameter when you first load the API. For example:
+      // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization">
+
+      var map, heatmap;
+	  
+	  var heat_data = false;
+	  var heatpoints = [];
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 13,
+          center: {lat: 37.779175, lng: -122.419195}, //any center for now - TODO: if needed to pick a diff center
+          mapTypeId: 'roadmap' //roadmap, satellite, hybrid, terrain
+        });
+
+        heatmap = new google.maps.visualization.HeatmapLayer({
+          data: getPoints(),
+          map: map
+        });
+      }
+
+      function toggleHeatmap() {
+        heatmap.setMap(heatmap.getMap() ? null : map);
+      }
+
+      function changeGradient() {
+        var gradient = [
+          'rgba(0, 255, 255, 0)',
+          'rgba(0, 255, 255, 1)',
+          'rgba(0, 191, 255, 1)',
+          'rgba(0, 127, 255, 1)',
+          'rgba(0, 63, 255, 1)',
+          'rgba(0, 0, 255, 1)',
+          'rgba(0, 0, 223, 1)',
+          'rgba(0, 0, 191, 1)',
+          'rgba(0, 0, 159, 1)',
+          'rgba(0, 0, 127, 1)',
+          'rgba(63, 0, 91, 1)',
+          'rgba(127, 0, 63, 1)',
+          'rgba(191, 0, 31, 1)',
+          'rgba(255, 0, 0, 1)'
+        ]
+        heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
+      }
+
+      function changeRadius() {
+        heatmap.set('radius', heatmap.get('radius') ? null : 20);
+      }
+
+      function changeOpacity() {
+        heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
+      }
+
+      // Heatmap data: 500 Points
+      function getPoints() {
+    	 $.ajax({
+            type: 'GET',
+            url: '/show_heat_map',
+            dataType: 'json',
+            data: {
+            },
+            success: function(data, status, xhr){
+			  	 
+				 $.each(data["locations"], function(index, item){
+				 	  console.log("****"+JSON.stringify(data["locations"]));
+                        var lat = item["latitude"];
+                        var lng = item["longitude"];
+						if (lat != null && lng != null) {
+							heatpoints.push(new google.maps.LatLng(lat, lng));
+						}
+						heat_data = true;
+                    }); 
+				
+            },
+            error: function(error){
+                alert("Error");
+            }
+        }, 5000);
+		alert(heatpoints);
+		return heatpoints;
+
+	  }
+    </script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCOkhBYG32UryOUuRf_xPCsK5tZretWHXk&libraries=visualization&callback=initMap">
+    </script>

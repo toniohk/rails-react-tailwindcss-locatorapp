@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Locator</title>
+    <link rel="stylesheet" type="text/scss" href="<%= root_url %>assets/surgeons.scss">
+    <link rel="stylesheet" type="text/css" href="<%= root_url %>assets/locator.css">
+    <%= javascript_include_tag 'https://maps.googleapis.com/maps/api/js?key='+Rails.application.secrets.google_maps_api_key %>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js">
+    </script>
+  </head>
+  <body class="font-sans leading-normal tracking-normal ">
+    <br/>
+    <div class="width-100perc">
+      <div class="content-box-locator width-100perc">
+        <article class="article width-100perc">
+          <header>
+            <h1 class="entry-title">
+              Surgeon Locator
+              <span class="pull-right"><span class="asterisk" style="color:red;">*</span> Required Fields</span>
+            </h1>
+          </header>
+          <div class="locator-content width-100perc">
+            <div id="wpsl-wrap">
+              <div style="background:#ffffff;" class="wpsl-search wpsl-clearfix wpsl-filter wpsl-checkboxes-enabled">
+                <div id="wpsl-search-wrap">
+                  <div>
+                   <%= form_with model: @search, action: "", id: "find_surgeon", remote: true, :class => 'w-full' do |f| %>
+                      <div class="wpsl-input md:w-1/4">
+                        <div class="locator-label-form">
+                          <%= f.label :zip_code, :class => "", :for => "wpsl-search-input" do %>
+                            Zip Code <span style="color:red;">*</span>
+                          <% end %>
+                        </div>
+                        <%= f.text_field :zip, maxlength: "5", required: true, :class => "drp-custom zip-input", :autocomplete => "off" %>
+                      </div>
+
+                      <div class="wpsl-input md:w-1/4">
+                        <div id="wpsl-radius">
+                          <%= f.label :search_radius, :class => "locator-label-form fl-none", :for => "wpsl-radius-dropdown" do %>
+                            Search Radius <span style="color:red;">*</span>
+                          <% end %>
+                        </div>
+                        <select id="search_search_radius" name="search[search_radius]" class="wpsl-dropdown drp-custom drp width-100perc" name="wpsl-radius" required="true">
+                          <option value="25">25 mi</option>
+                          <option value="50">50 mi</option>
+                          <option selected="selected" value="100">100 mi</option>
+                          <option value="200">200 mi</option>
+                          <option value="500">500 mi</option>
+                          <option value="1000">1000 mi</option>
+                        </select>
+                      </div>
+                      
+                      <div class="wpsl-input md:w-1/2">
+                        <div>
+                          <%= f.label :procedure_types, :class => "locator-label-form", :for => "wpsl-radius-dropdown" do %>
+                            <span style="float: left;">Select a Procedure Type: </span>
+                            <span style="color:red;float: left;">*</span>
+                            <a style="float:left;" onclick="proceduretypealert()"><img style="width:13px; margin-left:5px;margin-top: 10px;" src="<%= root_url %>assets/glyphicons-help.png"></a>
+                          <% end %>
+                        </div>
+                        <select data-name="proceduretype" id="search_procedure_types" name="search[procedure_types]" class="wpsl-dropdown drp-custom drp  width-100perc" required>
+                          <option value="" >PLEASE MAKE A SELECTION</option>
+                          <option value="Comprehensive Care" data-value="1">Comprehensive Care (Motion & Fusion)</option>
+                          <option value="Fusion" data-value="2">Fusion Only</option>
+                          <option value="Motion" data-value="3">Motion Preservation Only</option>
+                        </select>
+                        <%#= f.select :procedure_types, get_procedure_types, {:prompt => "Select a procedure type"}, { required: true, :class => "wpsl-dropdown wpsl-custom-dropdown"} %>
+                      </div>
+                      <div class="wpsl-input md:w-1/5">
+                        <%= f.label :area_of_discomfort, :class => "locator-label-form", :for => "wpsl-radius-dropdown" do %>
+                          Where is Your Discomfort? <span style="color:red;">*</span>
+                        <% end %>
+                        <select data-name="discomfortarea" id="search_area_of_discomfort" name="search[area_of_discomfort]" class="wpsl-dropdown drp-custom drp  width-100perc">
+                          <option value="Cervical" data-value="1">Neck, Shoulders, & Arms</option>
+                          <option value="Lumbar" data-value="2">Lower Back & Legs</option>
+                        </select>
+                      </div>
+                      <%#= f.select :area_of_discomfort, get_areas_of_discomfort, {:prompt => "Select an area of discomfort"}, { required: true, class: ""} %>
+                      <div class="wpsl-search-btn-wrap" style="width: 100%;">
+                        <input type="button" style="padding:10px 20px; margin-top: 10px; font-size: 14px; font-weight: normal; line-height: 1.42857143; border: 0px solid transparent; border-radius: 100px; background-color: #3ba9b9; color: #fff; box-shadow: none; background-image: none;" id="btn" value="FIND A SURGEON">
+                      </div>
+                    <% end %>
+                  </div>
+                  <div style="width: 100%;margin-top:25px;">
+                    <div id="surgeon_details" class="width-100p" style="margin: 0 !important;float: left;width: 33.5% !important;position: relative;overflow-y: hidden;max-height: 500px;">
+                    </div>
+                    <div id="wpsl-gmap" class="wpsl-gmap-canvas width-100p" style="margin: 0; width: 65.5%;height: 500px;padding-left: 0.5%;position: relative; overflow: hidden;float: right;">
+                      <div id="map" style="width: 100%;height: 100%;">
+                        <iframe frameborder="0" style="border:0; width: 100%;height: 100%;" src="https://www.google.com/maps/embed/v1/place?key=<%= Rails.application.secrets.google_maps_api_key %>&q=USA" allowfullscreen>
+                        </iframe>
+                      </div>
+                    </div>
+                  </div>
+                  <input type="hidden" id="markers_count" /><input type="hidden" id="host_url" value="<%= root_url %>" />
+                  <%= render partial: 'map_js' %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </body>
+</html>

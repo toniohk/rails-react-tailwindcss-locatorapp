@@ -1,0 +1,52 @@
+<div class="bg-blue-800 p-2 shadow text-xl text-white">
+    <h3 class="font-bold pl-2">Welcome to your dashboard. Please click on any menu.</h3>
+</div>
+<% if flash[:notice] %>
+<div class="notice">
+    <%= flash[:notice] %>
+</div>
+<% end %>
+<div class="wid">
+	<div class="dashbrd-div fl">
+		<%= link_to '<i class="fas fa-location-arrow dashbrd-ic"></i><p class="txt-p pad-10">All Locations - Listing of all the locations in the system</p>'.html_safe, locations_path %>
+	</div>
+	<div class="dashbrd-div fl">
+		<%= link_to '<i class="fas fa-user-md dashbrd-ic"></i><p class="txt-p pad-10">All Surgeons - Listing of all the surgeons in the system</p>'.html_safe, surgeons_path %>
+	</div>
+	<div class="dashbrd-div fl">
+		<%= link_to '<i class="far fa-plus-square dashbrd-ic"></i><p class="txt-p pad-10">New Location - Create a new location</p>'.html_safe, new_location_path %>
+	</div>
+	<div class="dashbrd-div fl">
+		<%= link_to '<i class="fas fa-search-location dashbrd-ic"></i><p class="txt-p pad-10">Surgeon Locator</p>'.html_safe, search_surgeons_path %>
+	</div>
+</div>
+	<hr />
+<div class="wid fl">
+	<div class="dashbrd-div fl">
+		<%= link_to '<i class="fas fa-info-circle dashbrd-ic ht-30"></i><p class="txt-p pad-10">Analytics Data - All searches by Zip codes. Click on Search Results to see the results that appeared</p>'.html_safe, admin_analytics_path %>
+	</div>
+	<div class="dashbrd-div fl">
+        <%= link_to '<i class="fas fa-file-export dashbrd-ic"></i><p class="txt-p pad-10">Export Database - Downloads DB in Excel</p>'.html_safe, export_db_path(format: :xlsx) %>
+	</div>
+	<div class="dashbrd-div fl">
+		<%= link_to '<i class="fas fa-file-download dashbrd-ic"></i><p class="txt-p pad-10">Client Report - Downloads the client specific report</p>'.html_safe, client_reports_path(format: :pdf) %>
+	</div>
+	<div class="dashbrd-div fl">
+		<%= link_to '<i class="fas fa-user-plus dashbrd-ic"></i><p class="txt-p pad-10">Invite User - Invite Admin/Location Managers to the system</p>'.html_safe, new_user_invitation_path %>
+	</div>
+	<div class="wid">
+	</div>
+</div>
+<div class="wid fl">
+	<div class="dashbrd-div fl">
+		<%= link_to '<i class="fas fa-users dashbrd-ic"></i><p class="txt-p pad-10">All Users - Listing of all the users in the system</p>'.html_safe, users_path %>
+	</div>
+	<div class="dashbrd-div fl">
+		<%= link_to '<i class="fas fa-unlock dashbrd-ic ht-30" ></i><p class="txt-p pad-10">Publish Surgeons - Activate the surgeons added by Location Managers.</p>'.html_safe, activate_surgeons_path %>
+	</div>
+	<div class="dashbrd-div fl">
+		<%= link_to '<i class="fas fa-unlock dashbrd-ic ht-30"></i><p class="txt-p pad-10">Publish Locations - Activate the locations added by Location Managers.</p>'.html_safe, activate_locations_path %>
+	</div>
+	<div class="wid">
+	</div>
+</div>

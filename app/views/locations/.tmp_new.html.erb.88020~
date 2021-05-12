@@ -1,0 +1,78 @@
+<h1> Add New Surgeon</h1>
+<%= form_with scope: :surgeon, local: true, url: surgeons_path, method: :post do |form| %>
+<% if @surgeon.errors.any? || @location.errors.any? %>
+    <div id="error_explanation" style="color: red">
+      <h2>
+      	<% @count = @surgeon.errors.count+@location.errors.count %>
+        <%= pluralize(@count, "error") %> prohibited
+        this surgeon from being saved:
+      </h2>
+      <ul>
+        <% @surgeon.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+		<% @location.errors.full_messages.each do |loc_msg| %>
+          <li><%= loc_msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <p>
+    <%= form.label :full_name %><br>
+    <%= form.text_field :full_name, autofocus: true %>
+  </p>
+  <p>
+    <%= form.label :email %><br>
+    <%= form.email_field :email %>
+  </p>
+  <p>
+    <%= form.label :website_url %><br>
+    <%= form.text_field :url %>
+  </p>
+  <p>
+    <%= form.label :professional_suffix %><br>
+    <%= form.text_field :suffix %>
+  </p>
+  <h2>Doctors Location</h2>
+  <%= fields_for :location do |loc| %>
+	  <p>
+	    <%= loc.label :location_name %><br>
+	    <%= loc.text_field :name %>
+	  </p>
+	  <p>
+	    <%= loc.label :address_1 %><br>
+	    <%= loc.text_field :address_1 %>
+	  </p>
+	  <p>
+	    <%= loc.label :address_2 %><br>
+	    <%= loc.text_field :address_2 %>
+	  </p>
+	  <p>
+	    <%= loc.label :city %><br>
+	    <%= loc.text_field :city %>
+	  </p>
+	  <p>
+	    <%= loc.label :state %><br>
+	    <%= loc.text_field :state %>
+	  </p>
+	  <p>
+	    <%= loc.label :zip %><br>
+	    <%= loc.text_field :zip %>
+	  </p>
+	  <p>
+	    <%= loc.label :country %><br>
+	    <%= loc.text_field :country %>
+	  </p>
+	  <p>
+	    <%= loc.label :phone_number %><br>
+	    <%= loc.text_field :phone_number %>
+	  </p>
+	  <p>
+	    <%= loc.label :fax_number %><br>
+	    <%= loc.text_field :fax_number %>
+	  </p>
+  <% end %>
+  <p>
+    <%= form.submit %>
+  </p>
+<% end %>

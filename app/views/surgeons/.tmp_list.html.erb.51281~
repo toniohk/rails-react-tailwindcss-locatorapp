@@ -1,0 +1,43 @@
+<h1>Surgeons</h1>
+<% if flash[:notice] %>
+    <div class="notice"><%= flash[:notice] %></div>
+<% end %>
+<% if current_user && (current_user.admin? || current_user.manager?) %>
+<%= link_to "Add Location", new_location_path %> 
+<% end %>
+<table>
+	<tr>
+		<th>Full Name</th>
+		<th>Email</th>
+		<th>Website Url</th>
+		<th>Professional Suffix</th>
+		<th>Location Name</th>
+		<th>Location Phone Number</th>
+		<th>State</th>
+		<th>Country</th>
+	</tr>
+	<% @surgeons.each do |surgeon| %>
+	<tr>
+	<td><%= surgeon.full_name %></td>
+	<td><%= surgeon.email %></td>
+	<td><%= surgeon.url %></td>
+	<td><%= surgeon.suffix %></td>
+	<% surgeon_location = surgeon.location %>
+	<td><%= surgeon_location.name %></td>
+	<td><%= surgeon_location.phone_number %></td>
+	<td><%= surgeon_location.state %></td>
+	<td><%= surgeon_location.country %></td>
+	<td><%= link_to "Show Details", surgeon_path(surgeon.id) %></td>
+	<% if current_user && (current_user.admin? || ( current_user.manager? && current_user.id == surgeon_location.user_id)) %>
+	<td><%= link_to "Edit me", edit_surgeon_path(surgeon.id) %></td>
+	<td><%= link_to "Delete", surgeon_path(surgeon.id), method: :delete %></td>
+	<% end %>
+	</tr>
+<% end %>
+</table>
+<div class="digg_pagination">
+    <div class="page_info">
+      <%= page_entries_info @surgeons %>
+    </div>
+    <%= will_paginate @surgeons, :container => false %>
+</div>

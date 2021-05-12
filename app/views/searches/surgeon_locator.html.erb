@@ -1,0 +1,394 @@
+<div class="bg-blue-800 p-2 shadow text-xl text-white">
+    <h3 class="font-bold pl-2">Surgeon Locator - Find the surgeons based on the search criteria</h3>
+</div>
+<div class="flex flex-wrap" style="margin: 4em;">
+    <%= form_with model: @search, id: "find_surgeon", remote: true, :class => 'w-full', :style => 'max-width: 60rem;'  do |f| %>
+    <div style="width: 100%;">
+        <div class="md:flex md:items-center mb-6" style="width: 50%;float:left;">
+            <div class="md:w-1/3">
+                <%= f.label :zip_code, :class => "block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" %>
+                <br/>
+            </div>
+            <div class="md:w-2/3">
+                <%= f.text_field :zip, maxlength: "5", required: true, class: "bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" %>
+            </div>
+        </div>
+        <div class="md:flex md:items-center mb-6" style="width: 50%;float:left;">
+            <div class="md:w-1/3">
+                <%= f.label :search_radius, :class => "block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" %>
+                <br/>
+            </div>
+            <div class="md:w-2/3">
+                <select id="search_search_radius" name="search[search_radius]" required="true" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500">
+                    <option value="100">100 miles</option>
+                    <option value="25">25 miles</option>
+                    <option value="50">50 miles</option>
+                    <option value="200">200 miles</option>
+                    <option value="500">500 miles</option>
+                    <option value="1000">1000 miles</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div style="width: 100%;">
+        <div class="md:flex md:items-center mb-6" style="width: 50%;float:left;">
+            <div class="md:w-1/3">
+                <%= f.label :procedure_types,:class => "block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" %>
+                <br/>
+            </div>
+            <div class="md:w-2/3">
+                <%= f.select :procedure_types, get_procedure_types, {:prompt => "Select a procedure type"}, { required: true, class: "bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"} %>
+            </div>
+        </div>
+        <div class="md:flex md:items-center mb-6" style="width: 50%;float:left;">
+            <div class="md:w-1/3">
+                <%= f.label :area_of_discomfort, :class => "block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" %>
+                <br/>
+            </div>
+            <div class="md:w-2/3">
+            	<select data-name="discomfortarea" id="search_area_of_discomfort" name="search[area_of_discomfort]" required="true" class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500">
+                    <option value="" data-value="1">Select an area of discomfort</option>
+					<option value="Cervical" data-value="1">Neck, Shoulders & Arms</option>
+                    <option value="Lumbar" data-value="2">Lower Back & Legs</option>
+                </select>
+			</div>
+        </div>
+    </div>
+    <div class="md:flex md:items-center mb-6" style="width: 100%;">
+        <div class="md:w-1/3">
+        </div>
+        <div class="md:w-2/3">
+            <%= f.submit 'Find a Surgeon', :class => "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+        </div>
+    </div>
+    <% end %>
+</div>
+<div class="flex flex-wrap">
+    <div id="map" class="set-map map-dimension">
+        <iframe width="600" height="400" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?key=<%= Rails.application.secrets.google_maps_api_key %>&q=USA" allowfullscreen>
+        </iframe>
+    </div>
+    <div id="surgeon_details" style="padding-left:10px;">
+    </div>
+</div>
+<input type="hidden" id="markers_count" />
+<input type="hidden" id="host_url" value="<%= root_url %>" />
+                                        <script>
+                                            var markers = [];
+                                            $('#find_surgeon').submit(function(){
+                                                var zip = $('#search_zip').val();
+                                                var search_radius = $('#search_search_radius').val();
+                                                var procedure_types = $('#search_procedure_types').val();
+                                                var area_of_discomfort = $('#search_area_of_discomfort').val();
+                                                var host_url = $('#host_url').val();
+                                                var map = $('#map');
+                                                if (zip != "" && search_radius != "" && procedure_types != "" && area_of_discomfort != "") {
+                                                    $("#surgeon_details").html("<span id='loader'><p class='fl'><img src='" + host_url + "/assets/ajax-loader.gif' /></p><p class='fl'>Looking for surgeons...</p></span>");
+                                                    $.ajax({
+                                                        type: 'POST',
+                                                        url: host_url + 'map_the_surgeons',
+                                                        dataType: 'json',
+                                                        data: {
+                                                            search_radius: search_radius,
+                                                            procedure_types: procedure_types,
+                                                            zip: zip,
+                                                            area_of_discomfort: area_of_discomfort
+                                                        },
+                                                        success: function(data, status, xhr){
+                                                            var prev_zip = "";
+                                                            var surgeon_list = [];
+                                                            if (data["locations"] && data["locations"].length > 0) {
+                                                                console.log(data["locations"]);
+                                                                console.log("latitude of zip code is " + data["latitude"]);
+                                                                console.log("longitude of zip code is " + data["longitude"]);
+                                                                var myCoords = new google.maps.LatLng(data["latitude"], data["longitude"]); //co-ordinates of zip code of user
+                                                                if (search_radius >= 500) {
+																	var zoom = 5;
+																}
+																else {
+																	var zoom = 8;
+																}
+																var mapOptions = {
+																		center: myCoords,
+																		zoom: zoom,
+																		gestureHandling: 'greedy'
+																	};
+                                                                var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+                                                                
+                                                                var icon = {
+                                                                    url: host_url + "assets/marker-icon-blue.png"
+                                                                };
+                                                                var marker = new google.maps.Marker({
+                                                                    position: myCoords,
+                                                                    title: "search location",
+                                                                    map: map,
+                                                                    icon: icon
+                                                                
+                                                                });
+                                                                markers.push(marker);
+                                                                var search_id = data["search_id"];
+                                                                console.log("search id is" + search_id);
+                                                                $.each(data["locations"], function(index, item){
+                                                                    var lat = item["latitude"];
+                                                                    var lng = item["longitude"];
+                                                                    console.log("latitude is " + lat + " and longitude is " + lng);
+                                                                    var location_name = item["name"];
+                                                                    var surgeon_name = item["full_name"];
+                                                                    var address_1 = item["address_1"];
+                                                                    var address_2 = item["address_2"];
+                                                                    var location_id = item["id"];
+                                                                    var phone_number = item["phone_number"];
+                                                                    var zip_code = item["zip"];
+                                                                    var state = item["state"];
+                                                                    var city = item["city"];
+                                                                    var suffix = item["suffix"];
+                                                                    var website_url = item["url"];
+                                                                    var procedure_types = item["procedure_types"];
+                                                                    var surgeon_id = item["surgeon_id"];
+                                                                    var latLng = new google.maps.LatLng(lat, lng);
+                                                                    var location_icon = {
+                                                                        url: host_url + "assets/marker-icon-orange.png"
+                                                                    };
+                                                                    
+                                                                    marker = new google.maps.Marker({
+                                                                        position: latLng,
+                                                                        map: map,
+                                                                        title: location_name,
+                                                                        icon: location_icon
+                                                                    });
+                                                                    
+                                                                    markers.push(marker);
+                                                                    var position = marker.getPosition();
+                                                                    var distance = get_distance(lat, lng, data["latitude"], data["longitude"], 'M').toFixed(1);
+                                                                    $("#surgeon_details").append(set_sidebar_content(surgeon_name, suffix, location_name, address_1, address_2, phone_number, zip_code, state, city, website_url, procedure_types, distance, latLng, search_id, surgeon_id, map, position, host_url));
+                                                                    surgeon_list.push({
+                                                                        "zip_code": zip_code,
+                                                                        "surgeon_name": surgeon_name,
+                                                                        "suffix": suffix
+                                                                    });
+                                                                    
+                                                                    if (prev_zip == zip_code) {
+                                                                        var info_box = set_content_multiple_surgeons(surgeon_list, location_name, address_1, address_2, phone_number, zip_code, state, city)
+                                                                    }
+                                                                    else {
+                                                                        var info_box = set_content(surgeon_name, suffix, location_name, address_1, address_2, phone_number, zip_code, state, city)
+                                                                    }
+                                                                    prev_zip = zip_code;
+                                                                    console.log("Sugeon list is " + JSON.stringify(surgeon_list));
+                                                                    var infowindow = new google.maps.InfoWindow;
+                                                                    return google.maps.event.addListener(marker, 'click', function(){
+                                                                        infowindow.setOptions({
+                                                                            content: info_box,
+                                                                            maxWidth: 300
+                                                                        });
+                                                                        return infowindow.open(map, this);
+                                                                    });
+                                                                    
+                                                                });
+                                                                $("#map").addClass("show-map");
+                                                                $("#map").removeAttr("style");
+                                                                $("#loader").remove();
+                                                                $("#surgeon_details").removeAttr("style");
+                                                                $("#surgeon_details").addClass("scroll-details-loc pad-10");
+                                                            }
+                                                            else {
+																if(data["latitude"] != null && data["longitude"] != null) {
+																	setMapOnAll(null);
+                                                                	$("#surgeon_details").html("<p>No surgeons are available in this area. Please modify your search criteria.</p>");
+																}
+																else {
+																	console.log("no results - check zipcode");
+                                                            		setMapOnAll(null);
+                                                            		$("#surgeon_details").html("<p>This is an invalid zip code. Please re-enter a valid zip code.</p>");
+																}
+                                                                
+                                                            }
+                                                            
+                                                        },
+                                                        error: function(data, status, xhr){
+                                                            console.log(xhr);
+                                                            setMapOnAll(null);
+                                                            $("#surgeon_details").html("<p>Something went wrong! Please modify the search criteria and try again.</p>");
+                                                        }
+                                                    });
+                                                }
+                                                else {
+                                                    $("#search_zip").addClass("wpsl-error");
+                                                    $("#search_zip").focus();
+                                                    
+                                                }
+                                            });
+                                            function set_content(surgeon_name, suffix, location_name, address_1, address_2, phone_number, zip_code, state, city){
+                                                var elements = "<div><p></p>";
+												if (surgeon_name != null && suffix != null) {
+													elements += "<h3 style='color:#3ba9b9; font-weight:500;'>" + surgeon_name + "," + suffix + "</h3>";
+												}
+												else {
+													if (suffix == null) {
+														elements += "<h3 style='color:#3ba9b9; font-weight:500;'>" + surgeon_name + "</h3>";
+													}
+												}
+												if (address_1 != null) {
+													elements += "<span>" + address_1 + "</span><br />";
+												}
+												if (address_2 != null) {
+													elements += "<span>" + address_2 + "</span><br/>";
+												}
+												if (city != null) {
+													elements += "<span>" + city + "</span>";
+												}
+												if (state != null && zip_code != null) {
+													elements += "<span> " + state + " " + zip_code + "</span>";
+												}
+												else {
+													if (state == null) {
+														elements += "<span> " + zip_code + "</span>";
+													}
+													if (zip_code == null) {
+														elements += "<span> " + state + "</span>";
+													}
+												}
+												if (phone_number != null) {
+													elements += "<p></p><span><strong>Phone</strong>: " + phone_number + "</span>";
+												}
+												elements += "<div class='wpsl-info-actions'><a class='wpsl-directions' href='#'></a></div></div>";
+												return elements;
+                                            }
+											
+                                            
+                                            function set_content_multiple_surgeons(surgeon_list, location_name, address_1, address_2, phone_number, zip_code, state, city){
+                                                console.log(JSON.stringify(surgeon_list));
+                                                var elements = "<div>This location has many surgeons. They are: <h3 style='color:#3ba9b9; font-weight:500;'>";
+                                                for (i = 0; i < surgeon_list.length; i++) {
+                                                    if (zip_code == surgeon_list[i]["zip_code"]) {
+                                                        elements += surgeon_list[i]['surgeon_name'] + "( " + surgeon_list[i]['suffix'] + " )";
+                                                        if (i == surgeon_list.length - 1) {
+                                                            elements += ".";
+                                                        }
+                                                        else {
+                                                            elements += ", ";
+                                                        }
+                                                    }
+                                                }
+                                                
+                                                elements += "</h3><p></p><h3 style='color:#3ba9b9; font-weight:500;'></h3><span>" + address_1 + "</span><br /><span>" + address_2 + "</span><br/><span>" + city + "</span><span>, " + state + ", " + zip_code + "</span><br /><p></p><span><strong>Phone</strong>: " + phone_number + "</span></div>";
+                                                return elements;
+                                            }
+                                            
+                                            function set_sidebar_content(surgeon_name, suffix, location_name, address_1, address_2, phone_number, zip_code, state, city, website_url, procedure_types, distance, lat_lng, search_id, surgeon_id, map, position, host_url){
+                                                var elements = "<div id='side_bar_content' onmouseover='animate_marker(" + surgeon_id + ");'><input type='hidden' value='" + position + "' id='position_" + surgeon_id + "' /><ul><li style='border-bottom: 1px dotted #ccc;'><div><p></p>";
+												if (surgeon_name != null && suffix != null) {
+													elements += "<h3 style='color:#3ba9b9; font-weight:500;'>" + surgeon_name + ", " + suffix + "</h3>";
+												}
+												else {
+													if (suffix == null){
+														elements += "<h3 style='color:#3ba9b9; font-weight:500;'>" + surgeon_name + "</h3>";
+													}
+										
+												}
+												if (location_name != null) {
+													elements += "<p style='margin-bottom:5px;'><strong>" + location_name + "</strong></p>";
+												}
+												if (address_1 != null) {
+													elements += "<span class='wpsl-street'>" + address_1 + "</span>";
+												}
+												if (address_2 != null) {
+													elements += "<span class='wpsl-street'>" + address_2 + "</span>";
+												}
+												if (city != null && state != null && zip_code != null) {
+													elements += "<span>" + city + " " + state + " " + zip_code + "</span>";
+												}
+												else {
+													if (city == null)
+													{
+														elements += "<span>" + state + " " + zip_code + "</span>";
+													}
+													if (state == null)
+													{
+														elements += "<span>" + city + " " + zip_code + "</span>";
+													}
+													if (zip_code == null) 
+													{
+														elements += "<span>" + city + " " + state + "</span>";
+													}
+												}
+												if (phone_number != null) {
+													elements += "<p><a onclick='save_phone(" + search_id + ", " + surgeon_id + ")' href='tel:" + phone_number + "' class='surgeonlocatorclick'>" + phone_number + "</a></p>";
+												}
+												if (website_url != null) {
+													var url = host_url + "track_the_clicks?search_id=" + search_id + "&surgeon_id=" + surgeon_id + "&url=" + website_url;
+													elements += "<a href='" + url + "' class='surgeonlocatorclick' target='_blank'>Visit Website »</a><br><br>";
+												}
+                                                if (procedure_types != null) {
+                                                    elements += "<img src='" + host_url + "assets/badge_comprehensivecare.png' style='width: 130px;height: 42px;'>";
+                                                }
+                                                elements += "</div><div class='distance_mi'>" + distance + " mi</div><a class='wpsl-directions' href='#'></a></li></ul></div>";
+                                                return elements;
+                                            }
+                                            
+                                            function setMapOnAll(map){
+                                                for (var i = 0; i < markers.length; i++) {
+                                                    markers[i].setMap(map);
+                                                }
+                                            }
+                                            
+                                            function animate_marker(surgeon_id){
+                                                var position = $("#position_" + surgeon_id).val();
+                                                for (var i = 0; i < markers.length; i++) {
+                                                    if (markers[i].getPosition() == position) {
+                                                        markers[i].setAnimation(4);
+                                                    }
+                                                }
+                                            }
+                                            
+											function get_distance(lat1, lon1, lat2, lon2, unit){
+                                                if ((lat1 == lat2) && (lon1 == lon2)) {
+                                                    return 0;
+                                                }
+                                                else {
+                                                    var radlat1 = Math.PI * lat1 / 180;
+                                                    var radlat2 = Math.PI * lat2 / 180;
+                                                    var theta = lon1 - lon2;
+                                                    var radtheta = Math.PI * theta / 180;
+                                                    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+                                                    if (dist > 1) {
+                                                        dist = 1;
+                                                    }
+                                                    dist = Math.acos(dist);
+                                                    dist = dist * 180 / Math.PI;
+                                                    dist = dist * 60 * 1.1515;
+                                                    if (unit == "K") {
+                                                        dist = dist * 1.609344
+                                                    }
+                                                    if (unit == "N") {
+                                                        dist = dist * 0.8684
+                                                    }
+                                                    return dist;
+                                                }
+                                            }
+                                            
+											
+                                            function proceduretypealert(){
+                                                alert("Motion Preservation: Total Disc Replacement (TDR) may be a solution for some patients with degenerative disc disease as an alternative to spinal fusion—providing the possibility for motion in the affected area. \n\nFusion: Spinal fusion may be a solution for some patients with degenerative disc disease who are not candidates for total disc replacement—providing the stability and security needed to help the spine heal.");
+                                            }
+											
+											function save_phone(search_id, surgeon_id){
+												var host_url = $('#host_url').val();
+												$.ajax({
+													type: 'POST',
+													url: host_url + 'track_the_phone',
+													crossDomain: true,
+													dataType: 'json',
+													data: {
+														search_id: search_id,
+														surgeon_id: surgeon_id
+													},
+													success: function(data, status, xhr){
+														console.log("success");
+													},
+													error: function(status){
+														console.log("Error in tracking the phone");
+													}
+												});
+											}
+                                        </script>

@@ -1,0 +1,90 @@
+<div class="bg-blue-800 p-2 shadow text-xl text-white">
+    <h3 class="font-bold pl-2">All Users - Listing of all the users in the system.</h3>
+</div>
+<% if flash[:notice] %>
+<div class="notice">
+    <%= flash[:notice] %>
+</div>
+<% end %>
+<%= form_tag '/reactive_users', method: :get do %>
+<% if params[:search] && params[:search] != "" %>
+<% @search_val = params[:search] %>
+<% else %>
+<% @search_val = "" %>
+<% end %>
+<%= text_field_tag :search, @search_val, :class => "bg-gray-200 appearance-none border-2 border-gray-200 rounded py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" %>
+<%= submit_tag 'Search', :class => "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" %>
+<% end %>
+<% if @users && @users.length > 0 %>
+<table class="table-fixed">
+    <thead>
+        <tr>
+            <th class="w-1/2 px-4 py-2">
+                Email
+            </th>
+			<th class="w-1/2 px-4 py-2">
+                Name
+            </th>
+            <th class="w-1/2 px-4 py-2">
+                Role
+            </th>
+            <th class="w-1/2 px-4 py-2">
+                Invitation Sent By
+            </th>
+            <th class="w-1/2 px-4 py-2">
+                Invitation Sent At
+            </th>
+            <th class="w-1/2 px-4 py-2">
+                Invitation Accepted At
+            </th>
+			<th class="w-1/2 px-4 py-2">
+            </th>
+			<th class="w-1/2 px-4 py-2">
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <% @users.each do |result| %>
+        <tr>
+            <td class="border px-4 py-2">
+                <%= result.email %>
+            </td>
+			<td class="border px-4 py-2">
+                <%= result.full_name %>
+            </td>
+            <td class="border px-4 py-2">
+                <%= result.role %>
+            </td>
+            <td class="border px-4 py-2">
+                <% if result.invited_by_id && result.invited_by_id != "" %>
+                <%= User.find(result.invited_by_id).email %>
+                <% end %>
+            </td>
+            <td class="border px-4 py-2">
+                <% if result.invitation_sent_at && result.invitation_sent_at != "" %>
+                <%= result.invitation_sent_at %>
+                <% end %>
+            </td>
+            <td class="border px-4 py-2">
+                <% if result.invitation_accepted_at && result.invitation_accepted_at != "" %>
+                <%= result.invitation_accepted_at %>
+                <% end %>
+            </td>
+			<td class="border px-4 py-2">
+				<%= link_to '<span class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded inline-flex items-center"><span class="fl">Reactive</span></span>'.html_safe, update_reactive_user_path(result.id), class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white"  %>
+			</td>
+        </tr>
+        <% end %>
+    </tbody>
+</table>
+<div class="digg_pagination">
+    <div class="page_info">
+        <%= page_entries_info @users %>
+    </div>
+    <%= will_paginate @users, :container => false %>
+</div>
+<% else %>
+<p>
+    No Results!
+</p>
+<% end %>

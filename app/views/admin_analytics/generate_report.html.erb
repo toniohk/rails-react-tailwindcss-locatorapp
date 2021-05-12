@@ -1,0 +1,289 @@
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<div class="ent cnt-ent">
+	<div class="logo-pdf">
+		<div class="fl-left pad-10">
+			rediscovermylife.org Locator Impact Report
+			<h3 class="font-bold pl-2">Prepared For: <%= @surgeon.full_name %>, <%= @surgeon.suffix %></h3>
+		</div>
+		<div class="fl-right pad-10">
+			<img src="/assets/logo_rediscover.png" class="wd-330"/>
+		</div>
+	</div>
+
+	<div class="ent_nofl wid dis-table">
+		<div class="gryBk frq-res ht-450 brdr-dv">
+		<% sum = 0 %>
+		<% @results_25.each do |res| %>
+		<% sum += res[1] %>
+		<% end %>
+		<% unless sum == 0 %>
+			<% new_data = {} %>
+			<% array_labels = [] %>
+			<% data = @results_25 %>
+			<% data.each do |result, index| %>
+				<% location_result = Geokit::Geocoders::GoogleGeocoder.geocode(result) %>
+				<% if location_result.city && location_result.city != "" %>
+					<% city = location_result.city %>
+					<% state = location_result.state %>
+					<% new_data[result.to_s + " (#{city}, #{state}) "] = data[result] %>
+					<% array_labels.push(result.to_s + " (#{city}, #{state})") %>
+				<% else %>
+					<% array_labels.push(result.to_s) %>
+				<% end %>
+			<% end %>
+			<input type="hidden" id="zips_list" value="<%= array_labels.join("-") %>">
+			<input type="hidden" id="count_surgeon_each_zip" value="<%= @results_25.values.join(",") %>">
+			<div class="highcharts-figure" style="width: 380px !important;height:450px !important;">
+    			<div id="high_chart"></div>
+			</div>
+			  <script>
+			  	var list = [];
+			  	list = $("#zips_list").val().split("-");
+				var data_list = [];
+				data_list = $("#count_surgeon_each_zip").val().split(",");
+				data_list = data_list.map(Number);
+			  	Highcharts.chart('high_chart', {
+				    chart: {
+				        type: 'bar',
+						backgroundColor: '#444444'
+				    },
+				    title: {
+				        text: 'Searches within 25 Miles Radius'
+				    },
+				    subtitle: {
+				        text: 'Top 10 results with locations and zipcodes',
+								style: {
+				            color: '#FFFFFF'
+				        }
+				    },
+				    xAxis: {
+				        categories: list,
+				        title: {
+				            text: null
+				        },
+								labels: {
+										style: {
+												color: '#FFFFFF'
+										}
+								}
+				    },
+				    yAxis: {
+				        min: 0,
+				        title: {
+				            text: 'Count',
+				            align: 'high'
+				        },
+				        labels: {
+				            overflow: 'justify',
+										style: {
+												color: '#FFFFFF'
+										}
+				        }
+				    },
+				    plotOptions: {
+				        bar: {
+				            dataLabels: {
+				                enabled: true
+				            }
+				        }
+				    },
+				    credits: {
+				        enabled: false
+				    },
+				    series: [{
+				        name: 'Number of searches',
+				        data: data_list,
+						color: '#FFD552'
+						}],
+					legend: {
+						itemStyle: {
+								color: '#FFFFF'
+						}
+					}
+				});
+			  </script>
+		<% end %>
+			<h3 class="pad-10">Total searches in 25 Mile Radius: <%= sum %></h3>
+		</div>
+
+		<div class="gryBk frq-zip ht-450 brdr-btm">
+		<% sum = 0 %>
+		<% @results_50.each do |res| %>
+		<% sum += res[1] %>
+		<% end %>
+		<% unless sum == 0 %>
+			<% new_data = {} %>
+			<% array_labels = [] %>
+			<% data = @results_50 %>
+			<% data.each do |result, index| %>
+				<% location_result = Geokit::Geocoders::GoogleGeocoder.geocode(result) %>
+				<% if location_result.city && location_result.city != "" %>
+					<% city = location_result.city %>
+					<% state = location_result.state %>
+					<% new_data[result.to_s + " (#{city}, #{state}) "] = data[result] %>
+					<% array_labels.push(result.to_s + " (#{city}, #{state})") %>
+				<% else %>
+					<% array_labels.push(result.to_s) %>
+				<% end %>
+			<% end %>
+			<input type="hidden" id="zips_list_50" value="<%= array_labels.join("-") %>">
+			<input type="hidden" id="count_surgeon_each_zip_50" value="<%= @results_50.values.join(",") %>">
+			  <div class="highcharts-figure chartjs-size-monitor" style="width: 380px !important;height:450px !important;">
+    			<div id="high_chart_50"></div>
+			  </div>
+			  <script>
+			  	var list = [];
+			  	list = $("#zips_list_50").val().split("-");
+				var data_list = [];
+				data_list = $("#count_surgeon_each_zip_50").val().split(",");
+				data_list = data_list.map(Number);
+			  	Highcharts.chart('high_chart_50', {
+				    chart: {
+				        type: 'bar',
+						backgroundColor: '#444444'
+				    },
+				    title: {
+				        text: 'Searches within 25-50 Mile Radius',
+						color: '#FFFFFF'
+				    },
+				    subtitle: {
+				        text: 'Top 10 results with locations and zipcodes',
+								style: {
+										color: '#FFFFFF'
+								}
+				    },
+				    xAxis: {
+				        categories: list,
+				        title: {
+				            text: null
+				        },
+								labels: {
+				            style: {
+				                color: '#FFFFFF'
+				            }
+				        }
+				    },
+				    yAxis: {
+				        min: 0,
+				        title: {
+				            text: 'Count',
+				            align: 'high'
+				        },
+				        labels: {
+				            overflow: 'justify',
+										style: {
+												color: '#FFFFFF'
+										}
+				        }
+				    },
+				    plotOptions: {
+				        bar: {
+				            dataLabels: {
+				                enabled: true
+				            }
+				        }
+				    },
+				    credits: {
+				        enabled: false
+				    },
+				    series: [{
+				        name: 'Number of searches',
+				        data: data_list,
+						color: '#FFD552'
+					}],
+					legend: {
+						itemStyle: {
+								color: '#FFFFF'
+						}
+					}
+				});
+			  </script>
+		<% end %>
+		<h3 class="pad-10">Total searches in 25-50 Mile Radius: <%= sum %> </h3>
+		</div>
+	</div>
+	<div class="ngryBk nat-srch brdr-rt">
+	<div class="gryBk wid ht-48 dis-table brdr-btm">
+		<h2 class="pad-10">Searches You Appear In:</h2>
+
+		<h2 class="pad-10" style="padding-top:0px;padding-bottom:0px">Number of calls: <%= @phone_calls %>, Number of clicks: <%= @total_clicks %></h2> 
+
+		<table class="table-fixed" style="margin-right: 10px;">
+			<thead>
+			<tr>
+				<th class="w-1/2 px-4 py-2"></th>
+				<th class="w-1/2 px-4 py-2">Cervical</th>
+				<th class="w-1/2 px-4 py-2">Lumbar</th>
+			</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="px-4 py-2 txtRt">Fusion</td>
+					<td class="border px-4 py-2"><% if @procedure_types && @procedure_types.include?("Cervical Fusion") %>Yes<% else %>No<% end %></td>
+					<td class="border px-4 py-2"><% if @procedure_types && @procedure_types.include?("Lumbar Fusion") %>Yes<% else %>No<% end %></td>
+				</tr>
+				<tr>
+					<td class="px-4 py-2 txtRt">Motion</td>
+					<td class="border px-4 py-2"><% if @procedure_types && @procedure_types.include?("Cervical Motion") %>Yes<% else %>No<% end %></td>
+					<td class="border px-4 py-2"><% if @procedure_types && @procedure_types.include?("Lumbar Motion") %>Yes<% else %>No<% end %></td>
+				</tr>
+				<tr>
+					<td class="px-4 py-2 txtRt">Comprehensive Care</td>
+					<td class="border px-4 py-2"><% if @procedure_types && @procedure_types.include?("Comprehensive Care Cervical") %>Yes<% else %>No<% end %></td>
+					<td class="border px-4 py-2"><% if @procedure_types && @procedure_types.include?("Comprehensive Care Lumbar") %>Yes<% else %>No<% end %></td>
+				</tr>
+		</tbody>
+		</table>
+	</div>
+
+	<div class="gryBk wid ht-50 dis-table">
+		<h2 class="mar-10">Area Searches:</h2>
+		<table class="table-fixed" style="margin-right: 10px;margin-bottom: 10px;">
+			<thead>
+			<tr>
+				<th class="w-1/2 padng-ls"></th>
+				<th class="w-1/2 padng-ls">Cervical</th>
+				<th class="w-1/2 padng-ls">Lumbar</th>
+				<th class="w-1/2 padng-ls">Total</th>
+			</tr>
+			</thead>
+			<tbody> 
+				<tr>
+					<td class="padng-ls txtRt">Fusion</td>
+					<td class="border padng-ls"><% @cervical_fusion_c = (@cervical_fusion_count.to_f * 100) / (@total_search_count).to_f %><%= number_to_percentage(@cervical_fusion_c, precision: 2) %></td> 
+					<td class="border padng-ls"><% @lumbar_fusion_c = (@lumbar_fusion_count * 100) / (@total_search_count).to_f %><%= number_to_percentage(@lumbar_fusion_c, precision: 2) %></td> 
+					<td class="border padng-ls"><% @total_fusion_c = @lumbar_fusion_c + @cervical_fusion_c %><%= number_to_percentage(@total_fusion_c, precision: 2) %></td>
+				</tr>
+
+				<tr>
+					<td class="padng-ls txtRt">Motion</td>
+					<td class="border padng-ls"><% @cervical_motion_c = (@cervical_motion_count * 100) / (@total_search_count).to_f %><%= number_to_percentage(@cervical_motion_c, precision: 2) %></td>
+
+					<td class="border padng-ls"><% @lumbar_motion_c = (@lumbar_motion_count * 100) / (@total_search_count).to_f %><%= number_to_percentage(@lumbar_motion_c, precision: 2) %></td>
+					<td class="border padng-ls"><% @total_motion_c = @lumbar_motion_c + @cervical_motion_c %><%= number_to_percentage(@total_motion_c, precision: 2) %></td>
+				</tr>
+
+				<tr>
+					<td class="padng-ls txtRt">Comprehensive Care</td>
+					<td class="border padng-ls"><% @cc_cervical_c = (@cc_fusion_count * 100) / (@total_search_count).to_f %><%= number_to_percentage(@cc_cervical_c, precision: 2) %></td>
+					<td class="border padng-ls"><% @cc_lumbar_c = (@cc_motion_count * 100) / (@total_search_count).to_f %><%= number_to_percentage(@cc_lumbar_c, precision: 2) %></td>
+					<td class="border padng-ls"><% @total_cc = @cc_cervical_c + @cc_lumbar_c %><%= number_to_percentage(@total_cc, precision: 2) %></td>
+				</tr>
+
+				<tr>
+					<td class="padng-ls txtRt">Total</td>
+					<td class="border padng-ls"><% @total_cervical_c = @cervical_fusion_c + @cervical_motion_c + @cc_cervical_c %><%= number_to_percentage(@total_cervical_c, precision: 2) %></td>
+
+					<td class="border padng-ls"><% @total_lumbar_c = @lumbar_fusion_c + @lumbar_motion_c + @cc_lumbar_c %><%= number_to_percentage(@total_lumbar_c, precision: 2) %></td>
+					<td class="padng-ls"></td>
+				</tr>
+
+		</tbody>
+		</table>
+	</div>
+	</div>
+	<div class="gryBk ht-550 dv-map">
+		<p class="wid mar-10">Search Intensity Map:</p>
+		<%= render "heat_map", :locals => { :surgeon => @surgeon } %>
+	</div>
+</div>

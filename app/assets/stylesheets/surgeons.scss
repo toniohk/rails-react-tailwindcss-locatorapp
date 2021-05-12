@@ -1,0 +1,295 @@
+// Place all the styles related to the surgeons controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: https://sass-lang.com/
+.notice {
+	color: green;
+	padding: 0.5em;
+}
+.digg_pagination {
+  background: white;
+  cursor: default;
+  /* self-clearing method: */ }
+  .digg_pagination a, .digg_pagination span, .digg_pagination em {
+    padding: 0.2em 0.5em;
+    display: block;
+    float: left;
+    margin-right: 1px; }
+  .digg_pagination .disabled {
+    color: #999999;
+    border: 1px solid #dddddd; }
+  .digg_pagination .current {
+    font-style: normal;
+    font-weight: bold;
+    background: #2e6ab1;
+    color: white;
+    border: 1px solid #2e6ab1; }
+  .digg_pagination a {
+    text-decoration: none;
+    color: #105cb6;
+    border: 1px solid #9aafe5; }
+    .digg_pagination a:hover, .digg_pagination a:focus {
+      color: #000033;
+      border-color: #000033; }
+  .digg_pagination .page_info {
+    background: #2e6ab1;
+    color: white;
+    padding: 0.4em 0.6em;
+    //width: 22em;
+    margin-bottom: 0.3em;
+    text-align: center; }
+    .digg_pagination .page_info b {
+      color: #000033;
+      background: #6aa6ed;
+      padding: 0.1em 0.25em; }
+  .digg_pagination:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden; }
+  * html .digg_pagination {
+    height: 1%; }
+  *:first-child + html .digg_pagination {
+    overflow: hidden; }
+
+#error_explanation {
+color: red
+}
+form {
+	margin: 2em;
+}
+#chart-1 {
+background: #e2e8f0;
+}
+#chart-2 {
+background: #e2e8f0;
+}
+.set-map {
+margin-left: 10em;
+}
+.fl {
+	float: left;
+}
+.h-svg-dld {
+	height: 1.5rem;
+}
+.scroll-details {
+	overflow-y: scroll;
+	height: 400px;
+	padding-left: 10px;
+}
+.ent {
+        background-color: black !important;
+        color: white;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    .ent_nofl {
+        background-color: black !important;
+        color: white;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    .gryBk {
+        background-color: #444444 !important;
+    }
+    
+    .txtRt {
+        text-align: right;
+    }
+    
+    .pd {
+        padding: 0.2em
+    }
+	.cnt-ent {
+		width:100%; 
+		height: 100%;
+		display: table;
+	}
+	.fl-left {
+		float: left;
+	}
+	.fl-right {
+		float: right;
+	}
+	.pad-10 {
+		padding: 10px;
+	}
+	.frq-res {
+		clear: left;
+		float: left;
+		width: 50%;
+		height: 450px;
+	}
+	.tbl-frq{
+		width: 85%;
+		margin: 10px;
+	}
+	.frq-zip {
+		float: left;
+		width: 50%;
+	}
+	.mar-10 {
+		margin: 10px;
+	}
+	.wid {
+		width: 100%;
+	}
+	.nat-srch{
+		clear:left; 
+		float: left; 
+		width: 50%;
+		height: 550px;
+	}
+	.ht-550{
+		height: 550px;
+	}
+	.ht-450{
+		height: 450px;
+	}
+	.wd-330 {
+		width: 300px;
+	}
+	.logo-pdf{
+		width:100%; 
+		height: 100px;
+	}
+	.wd-75{
+		width: 75%;
+	}
+	.wd-80{
+		width:80%;
+	}
+	.mar-2{
+		margin-top: 2%;
+	}
+	.ht-50 {
+		height: 50%;
+	}
+	.ht-48 {
+		height: 48%;
+	}
+	.bar-50{
+    	float: right;
+    	width: 48%;
+    }
+    .dis-table {
+    	display: table;
+    }
+    .wd-45{
+		width:45%;
+	}
+	.wd-50{
+		width: 50%;
+	}
+	.frq-mp {
+		float: right;
+		width: 48%;
+	}
+/*high charts */
+	.highcharts-figure, .highcharts-data-table table {
+    /*margin: 1em auto;*/
+}
+
+
+.highcharts-data-table table {
+	font-family: Verdana, sans-serif;
+	border-collapse: collapse;
+	border: 1px solid #EBEBEB;
+	text-align: center;
+	width: 100%;
+}
+.highcharts-data-table caption {
+    font-size: 1.2em;
+    color: #555;
+}
+.highcharts-data-table th {
+	font-weight: 600;
+}
+.highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+}
+.highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
+    background: #f8f8f8;
+}
+.highcharts-data-table tr:hover {
+    background: #f1f7ff;
+}
+.map-dimension {
+width: 600px;
+height: 500px;
+}
+.pad-30 {
+	padding-top:30px;
+}
+html{
+ overflow-x: hidden;
+}
+.dashbrd-ic {
+    font-size: 50px;
+    color: #FFA500;
+    margin: 0 auto;
+    text-align: center;
+    width: 50%;
+    margin-left: 25%;
+    margin-right: 25%;
+    margin-top: 5%;
+    height: 50%;
+}
+.txt-p {
+text-align: center;
+}
+.dashbrd-div {
+	width: 20%;
+	height: 145px;
+	margin: 0 auto;
+	display: table;
+	border: 1px solid gray;
+	margin:2.5%
+}
+.wd-25 {
+	width: 25%;
+}
+.ht-30 {
+	height: 30% !important;
+}
+
+	
+.ht-425{
+		height: 425px;
+	}
+	.ht-500{
+		height: 500px;
+	}
+	.brdr-rt {
+		border-right: 4px solid #000000;
+	}
+	.dv-map {
+		float: right;
+		max-width:500px;
+		height:550px;
+		margin: auto;
+	}
+	.brdr-btm {
+		border-bottom: 4px solid #000000;
+	}
+	.brdr-dv {
+		border-right: 6px solid #000000;
+		border-bottom: 4px solid #000000;
+	}
+	.map-fix {
+		margin-top: 5px;
+		width: 390px;
+		height:500px;
+		display: table;
+	}
+	.padng-ls {
+        padding: 0.5em
+    }
+    .highcharts-title {
+    	color: #FFFFFF !important;
+    	fill: #FFFFFF !important;
+    }
+    .highcharts-legend-item {
+    	color: #FFFFFF !important;
+    	fill: #FFFFFF !important;
+    }

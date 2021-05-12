@@ -1,0 +1,14 @@
+<%= @surgeon.full_name %>
+<%= @surgeon.email %>
+<%= @surgeon.url %>
+<%= @surgeon.suffix %>
+<%= @location.name %>
+<%= @location.address_1 %>
+<%= @location.address_2 %>
+<%= @location.city %>
+<%= @location.state %>
+<%= @location.zip %>
+<%= @location.country %>
+<%= @location.phone_number %>
+<%= @location.fax_number %>
+<%= link_to "Edit me", edit_surgeon_path(@surgeon.id) %>

@@ -1,0 +1,26 @@
+<%- if controller_name != 'sessions' %>
+<div class="md:w-2/3">
+	<%= link_to '<span class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded inline-flex items-center"><span class="fl">Log in</span></span>'.html_safe, new_session_path(resource_name), class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white"  %>
+    <br/>
+</div>
+<% end %>
+<%- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
+<div class="md:w-2/3">
+	<%= link_to '<span class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded inline-flex items-center"><span class="fl">Forgot password?</span></span>'.html_safe, new_password_path(resource_name), class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white"  %>
+    <br/>
+</div>
+<% end %>
+<%- if devise_mapping.confirmable? && controller_name != 'confirmations' %>
+<%= link_to "Didn't receive confirmation instructions?", new_confirmation_path(resource_name), :class => "hover:bg-blue-700 text-black font-bold py-2 px-4 rounded" %>
+<br/>
+<% end %>
+<%- if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) && controller_name != 'unlocks' %>
+<%= link_to "Didn't receive unlock instructions?", new_unlock_path(resource_name), :class => "hover:bg-blue-700 text-black font-bold py-2 px-4 rounded" %>
+<br/>
+<% end %>
+<%- if devise_mapping.omniauthable? %>
+<%- resource_class.omniauth_providers.each do |provider| %>
+<%= link_to "Sign in with #{OmniAuth::Utils.camelize(provider)}", omniauth_authorize_path(resource_name, provider), :class => "hover:bg-blue-700 text-black font-bold py-2 px-4 rounded" %>
+<br/>
+<% end %>
+<% end %>

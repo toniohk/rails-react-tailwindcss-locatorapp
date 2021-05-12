@@ -1,0 +1,106 @@
+<% if @surgeon && @surgeon.id != "" %>
+	<div id="surgeon_id" style="display: none;"><%= "#{@surgeon.id}" %></div>
+	<div id="surgeon_latitude" style="display: none;"><%= "#{@surgeon.location.latitude}" %></div>
+	<div id="surgeon_longitude" style="display: none;"><%= "#{@surgeon.location.longitude}" %></div>
+<% end %>
+<div id="map" class="map-fix">
+</div>
+<script>
+    var map, heatmap;
+    var heatpoints = [];
+	
+
+	function initMap() {
+		if ($("#surgeon_id").html() && $("#surgeon_id").html() != "") {
+			var surgeon_id = parseInt($("#surgeon_id").html());
+		}
+		else {
+			var surgeon_id = "";
+		}
+
+		$.ajax({
+			type: 'GET',
+			url: '/show_heat_map',
+			dataType: 'json',
+			data: { surgeon_id: surgeon_id },
+			success: function(data, status, xhr) {
+				if (data["locations"] && data["locations"].length > 0) {
+					map = new google.maps.Map(document.getElementById('map'), {
+						zoom: 8,
+						center: {
+							lat: data["center"]["latitude"],
+							lng: data["center"]["longitude"]
+						},
+						mapTypeId: 'roadmap' //roadmap, satellite, hybrid, terrain
+					});
+					$.each(data["locations"], function(index, item) {
+						heatpoints.push(new google.maps.LatLng(item["latitude"], item["longitude"])); //all the heatpoints
+					});
+					console.log("HEAT POINTS IS "+heatpoints);
+					heatmap = new google.maps.visualization.HeatmapLayer({
+						data: heatpoints,
+						map: map,
+						radius: 50,
+						gradient: [
+							'rgba(255, 0, 0, 0)',
+							'rgba(255, 255, 0, 1)',
+							'rgba(255, 255, 0, 1)',
+							'rgba(255, 255, 0, 1)',
+						]
+					});
+					var cityCircle = new google.maps.Circle({
+            strokeColor: '#000000',
+            strokeOpacity: 0.6,
+            strokeWeight: 2,
+            fillColor: 'none',
+            fillOpacity: 0,
+            map: map,
+            center: {lat: data["center"]["latitude"], lng: data["center"]["longitude"]},
+            radius: 50 * 1610
+          });
+					var cityCircle25 = new google.maps.Circle({
+            strokeColor: '#000000',
+            strokeOpacity: 0.6,
+            strokeWeight: 2,
+            fillColor: 'none',
+            fillOpacity: 0,
+            map: map,
+            center: {lat: data["center"]["latitude"], lng: data["center"]["longitude"]},
+            radius: 25 * 1610
+          });
+				}
+				else /* If there are no links clicked in the search results - display US lat and lng*/
+				{
+					if ($("#surgeon_latitude").html() && $("#surgeon_latitude").html() != "" && $("#surgeon_longitude").html() && $("#surgeon_longitude").html() != "" ) {
+						var latitude = $("#surgeon_latitude").html();
+						var longitude = $("#surgeon_longitude").html();
+						map = new google.maps.Map(document.getElementById('map'), {
+							zoom: 6,
+							center: {
+								lat: parseInt(latitude), 
+								lng: parseInt(longitude)
+							},
+							gestureHandling: 'greedy'
+						});	
+					}
+					else {  /* client report that doesnt have any website link clicked - shows the map with co-ordinates of USA.*/
+						map = new google.maps.Map(document.getElementById('map'), {
+							zoom: 4,
+							center: {
+								lat: 37.09, 
+								lng: -95.71
+							},
+							gestureHandling: 'greedy'
+						});	
+					}
+				}
+				google.maps.event.trigger(map, 'resize');
+			},
+			error: function(error){
+			console.log("Error");
+			}
+		});
+	}
+</script>
+<%= javascript_include_tag 'https://maps.googleapis.com/maps/api/js?key='+Rails.application.secrets.google_maps_api_key+'&libraries=visualization&callback=initMap' %>
+

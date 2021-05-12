@@ -1,0 +1,58 @@
+<div class="bg-blue-800 p-2 shadow text-xl text-white">
+    <h3 class="font-bold pl-2">Activate - Locations added by location managers.</h3>
+</div>
+<% if flash[:notice] %>
+<div class="notice">
+    <%= flash[:notice] %>
+</div>
+<% end %>
+<%= form_tag activate_locations_path, method: :get do %>
+<% if params[:search] && params[:search] != "" %>
+<% @search_val = params[:search] %>
+<% else %>
+<% @search_val = "" %>
+<% end %>
+<%= text_field_tag :search, @search_val, :class => "bg-gray-200 appearance-none border-2 border-gray-200 rounded py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" %>
+<%= submit_tag 'Search', :class => "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" %>
+<% end %>
+<% if @locations && @locations.length > 0 %>
+<table class="table-fixed">
+    <thead>
+        <tr>
+            <th class="w-1/2 px-4 py-2">
+                Name
+            </th>
+			<th class="w-1/2 px-4 py-2">
+                Address
+            </th>
+			<th class="w-1/2 px-4 py-2">
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <% @locations.each do |result| %>
+        <tr>
+            <td class="border px-4 py-2">
+                <%= result.name %>
+            </td>
+			<td class="border px-4 py-2">
+                <%= result.address_1 %>,<%= result.address_2 %>, <%= result.city %>, <%= result.state %>
+            </td>
+			<td class="border px-4 py-2">
+				<%= link_to '<span class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded inline-flex items-center"><span class="fl">Activate</span></span>'.html_safe, publish_location_path(:id => result.id), class: "block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white"  %>
+			</td>
+        </tr>
+        <% end %>
+    </tbody>
+</table>
+<div class="digg_pagination">
+    <div class="page_info">
+        <%= page_entries_info @locations %>
+    </div>
+    <%= will_paginate @locations, :container => false %>
+</div>
+<% else %>
+<p>
+    No Results!
+</p>
+<% end %>

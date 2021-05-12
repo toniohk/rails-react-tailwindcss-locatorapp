@@ -1,0 +1,109 @@
+<div class="bg-blue-800 p-2 shadow text-xl text-white">
+    <h3 class="font-bold pl-2">All Surgeons - Listing of all the surgeons 
+	<% if @location && params[:user_id] %> in my location: 
+		<% if @location.name && @location.name != "" %><%= @location.name %><% end %>
+		<% if @location.address_1 && @location.address_1 != "" %>, <%= @location.address_1 %><% end %>
+		<% if @location.address_2 && @location.address_2 != "" %>, <%= @location.address_2 %><% end %>
+		<% if @location.city && @location.city != "" %>, <%= @location.city %><% end %>
+		<% if @location.state && @location.state != "" %>, <%= @location.state %><% end %>
+		<% if @location.zip && @location.zip != "" %>-<%= @location.zip %><% end %>
+	<% else %>the system
+	<% end %>
+	</h3>
+</div>
+<% if flash[:notice] %>
+    <div class="notice"><%= flash[:notice] %></div>
+<% end %>
+<%= form_tag surgeons_path, method: :get do %>
+  <% if params[:search] && params[:search] != "" %>
+  	<% @search_val = params[:search] %>
+  <% else %>
+  	<% @search_val = "" %>
+  <% end %>
+  <%= text_field_tag :search, @search_val, :class => "bg-gray-200 appearance-none border-2 border-gray-200 rounded py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" %>
+  <% if params[:user_id] && params[:user_id] != "" %>
+  <%= hidden_field_tag :user_id, params[:user_id] %>
+  <% end %>
+  <%= submit_tag "Search", :class => "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" %>
+<% end %>
+<% if @surgeons && @surgeons.length > 0 %>
+	<table class="table-fixed">
+		<thead>
+		<tr>
+			<th class="px-4 py-2">First Name</th>
+			<th class="px-4 py-2">Last Name</th>
+			<th class="px-4 py-2">Email</th>
+			<th class="px-4 py-2">Website Url</th>
+			<th class="px-4 py-2">Location</th>
+			<th class="px-4 py-2">Status</th>
+			<th class="px-4 py-2"></th>
+			
+		</tr>
+		</thead>
+		<tbody>
+			<% status_mapping = { "publish" => "Published", "private" => "Private" } %>
+			<% @surgeons.each do |surgeon| %>
+				<tr>
+					<td class="border px-4 py-2">
+						<%= surgeon.full_name.to_s.split(" ").first %>
+					</td>
+					<td class="border px-4 py-2">
+						<% if surgeon.suffix && surgeon.suffix != "" %>
+							<%= surgeon.full_name.to_s.split(" ").last %>, <%= surgeon.suffix %>
+						<% else %>
+							<%= surgeon.full_name.to_s.split(" ").last %>
+						<% end %>
+					</td>
+					<td class="border px-4 py-2"><%= surgeon.email %></td>
+					<td class="border px-4 py-2" style="max-width:250px;word-wrap:break-word;"><%= surgeon.url %></td>
+					<% surgeon_location = surgeon.location %>
+					<td class="border px-4 py-2">
+						<% if surgeon_location.name && surgeon_location.name != "" %>
+							<%= surgeon_location.name %>
+						<% end %>
+						<br/>
+						<% if surgeon_location.address_1 && surgeon_location.address_1 != "" %>
+							<%= surgeon_location.address_1 %>
+						<% end %>
+						<br />
+						<% if surgeon_location.state != "" && surgeon_location.city != "" && surgeon_location.zip != "" %>
+							<%= surgeon_location.city %>, <%= surgeon_location.state %>, <%= surgeon_location.zip %>
+						<% elsif surgeon_location.state = "" %>
+							<%= surgeon_location.city %>, <%= surgeon_location.zip %>
+						<% elsif surgeon_location.city = "" %> 
+							<%= surgeon_location.state %>, <%= surgeon_location.zip %>
+						<% elsif surgeon_location.zip = "" %> 
+							<%= surgeon_location.city %>, <%= surgeon_location.state %>
+						<% end %>
+						<br />
+						<% if surgeon_location.phone_number && surgeon_location.phone_number != "" %>
+							Phone: <%= surgeon_location.phone_number %>
+						<% end %>
+					</td>
+					<td class="border px-4 py-2">
+						<%= status_mapping[surgeon_location.status] %>
+					</td>
+					<% if current_user && (current_user.admin? || (current_user.manager? && current_user.id == surgeon_location.user_id)) %>
+						<td class="border px-4 py-4" style="min-width: 210px;">
+							<%= link_to '<span class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded inline-flex items-center"><i class="fas fa-edit"></i></span>'.html_safe, edit_surgeon_path(surgeon.id), class: "my-2 py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white", title: "Edit Surgeon" %>
+
+							<%= link_to '<span class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded inline-flex items-center"><i class="fas fa-trash"></i></span>'.html_safe, surgeon_path(surgeon.id), method: :delete, data: { confirm: "Are you sure?" }, class: "my-2 py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white", title: "Delete Surgeon" %>
+
+							<%= link_to '<span class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded inline-flex items-center"><i class="fas fa-download"></i>'.html_safe, generate_report_path(surgeon_id: surgeon.id, format: :pdf), class: "my-2 py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white", title: "Download Report" %>
+						</td>
+					<% else %>
+						<td class="border px-4 py-2">-</td>
+					<% end %>
+				</tr>
+			<% end %>
+	</tbody>
+	</table>
+	<div class="digg_pagination">
+	    <div class="page_info">
+	      <%= page_entries_info @surgeons %>
+	    </div>
+	    <%= will_paginate @surgeons, :container => false %>
+    </div>
+  <% else %>
+  	<p class="pad-10">There are are no surgeons!</p>
+  <% end %>

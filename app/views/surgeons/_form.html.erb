@@ -1,0 +1,136 @@
+<%= form_with model: @surgeon, local: true, :class => 'w-full max-w-lg' do |f| %>
+<% if flash[:notice] %>
+<div class="notice">
+    <%= flash[:notice] %>
+</div>
+<% end %>
+<div class="">
+    <% if @surgeon.errors.any? %>
+    <div id="error_explanation" style="color: red">
+        <h2><% @count = @surgeon.errors.count %>
+            <%= pluralize(@count, "error") %>prohibited
+            this surgeon from being saved:</h2>
+        <ul>
+            <% @surgeon.errors.full_messages.each do |msg| %>
+            <li>
+                <%= msg %>
+            </li>
+            <% end %>
+        </ul>
+    </div>
+    <% end %>
+</div>
+<div class="md:flex md:items-center mb-6">
+    <div class="md:w-1/3">
+        <%= f.label :location, :class => "block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" %>
+    </div>
+    <div class="md:w-2/3">
+        <%= f.select :location_id, options_for_select([['Select Location', '']]+Location.all.map{|location| [location.address, location.id]}, @surgeon.location_id), {}, autofocus: true, :class => "block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" %>
+    </div>
+</div>
+
+<div class="md:flex md:items-center mb-6">
+    <div class="md:w-1/3">
+        <%= f.label :full_name, :class => "block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" %>
+        <br/>
+    </div>
+    <div class="md:w-2/3">
+        <%= f.text_field :full_name, autofocus: true, required: true, :class => "bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" %>
+    </div>
+</div>
+<div class="md:flex md:items-center mb-6">
+    <div class="md:w-1/3">
+        <%= f.label :email, :class => "block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" %>
+        <br/>
+    </div>
+    <div class="md:w-2/3">
+        <%= f.email_field :email, :class => "bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" %>
+    </div>
+</div>
+<div class="md:flex md:items-center mb-6">
+    <div class="md:w-1/3">
+        <%= f.label :website_url, :class => "block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" %>
+        <br/>
+    </div>
+    <div class="md:w-2/3">
+        <% if !@surgeon.url %><% @website = @location.website %><% elsif @surgeon.url %><% @website = @surgeon.url %><% else %><% @website = "" %><% end %>
+        <%= f.text_field :url, :class => "bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500", value: @website %>
+    </div>
+</div>
+<div class="md:flex md:items-center mb-6">
+    <div class="md:w-1/3">
+        <%= f.label :phone_no, :class => "block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" %>
+        <br/>
+    </div>
+    <div class="md:w-2/3">
+        <% if !@surgeon.phone %><% @phone = @location.phone_number %><% elsif @surgeon.phone %><% @phone = @surgeon.phone %><% else %><% @phone = "" %><% end %>
+        <%= f.text_field :phone, :class => "bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500", value: @phone %>
+    </div>
+</div>
+<div class="md:flex md:items-center mb-6">
+    <div class="md:w-1/3">
+        <%= f.label :professional_suffix, :class => "block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" %>
+        <br/>
+    </div>
+    <div class="md:w-2/3">
+        <%= f.text_field :suffix, :class => "bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" %>
+    </div>
+</div>
+<% if current_user && current_user.admin? %>
+<div class="md:flex md:items-center mb-6">
+    <div class="md:w-1/3">
+        <%= f.label :status, :class => "block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" %>
+        <br/>
+    </div>
+    <div class="md:w-2/3">
+        <%= f.collection_select :status, Surgeon::STATUS, :to_s, :titleize, {selected: @surgeon.status}, {class: "bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"} %>
+    </div>
+</div>
+<div class="md:flex md:items-center mb-6">
+    <div class="md:w-1/3">
+        <br/>
+    </div>
+    <div class="md:w-2/3">
+        <%= f.label "Set procedure types by checking the below boxes",:class => "block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" %>
+    </div>
+</div>
+<br/>
+<% @surgeon_proc = @surgeon.procedure_types_array %> 
+
+
+<% @proc = get_procedure_types %>
+<% @proc.each do |proc_type| %>
+<div class="md:flex md:items-center mb-6">
+    <div class="md:w-1/3">
+        <label class="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
+            <%= proc_type %>
+        </label>
+        <br/>
+    </div>
+    <div class="md:w-2/3"> 
+
+    	<% if @surgeon_proc && @surgeon_proc.include?(proc_type.to_s)%>
+			<%= f.check_box :procedure_types_array, {multiple: true, checked: true}, proc_type %>
+		<% else %>
+			<%= f.check_box :procedure_types_array, {multiple: true}, proc_type %>
+		<% end %>
+        
+    </div>
+</div>
+<% end %>
+<% end %>
+<div class="md:flex md:items-center mb-6">
+    <div class="md:w-1/3">
+        <% if params[:location_id] %>
+        <%= f.hidden_field :location_id, value: params[:location_id] %>
+        <% end %>
+    </div>
+    <div class="md:w-2/3">
+        <% if params[:location_id] %>
+        <%= f.submit 'Save Surgeon', :class => "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+        <% else %>
+        <%= f.submit 'Update', :class => "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+        <% end %>
+    </div>
+</div>
+<% end %>

@@ -1,0 +1,49 @@
+<div id="map">
+</div>
+
+<script>
+    var map, heatmap;
+    var heatpoints = [];
+	
+    function initMap(){
+        
+        $.ajax({
+            type: 'GET',
+            url: '/show_heat_map',
+            dataType: 'json',
+            data: {},
+            success: function(data, status, xhr){
+            
+                $.each(data["locations"], function(index, item){
+					if (index == 0) { //To get the center point of heat map
+						map = new google.maps.Map(document.getElementById('map'), {
+			            zoom: 10,
+			            center: {
+			                lat: item["latitude"],
+			                lng: item["longitude"]
+			            }, 
+			            mapTypeId: 'roadmap' //roadmap, satellite, hybrid, terrain
+			        });	
+					}
+                    var lat = item["latitude"];
+                    var lng = item["longitude"];
+                    if (lat != null && lng != null) {
+                        heatpoints.push(new google.maps.LatLng(lat, lng)); //all the heatpoints
+                    }
+                });
+				console.log("HEAT POINTS IS "+heatpoints);
+                heatmap = new google.maps.visualization.HeatmapLayer({
+                    data: heatpoints,
+                    map: map
+                });
+            },
+            error: function(error){
+                console.log("Error");
+            }
+        });
+        
+        
+    }
+    
+</script>
+<%= javascript_include_tag 'https://maps.googleapis.com/maps/api/js?key='+Rails.application.secrets.google_maps_api_key+'&libraries=visualization&callback=initMap' %>

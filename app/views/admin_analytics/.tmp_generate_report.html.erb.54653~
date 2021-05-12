@@ -1,0 +1,104 @@
+<div class="bg-blue-800 p-2 shadow text-xl text-white">
+    <h3 class="font-bold pl-2">Prepared for: <%= @surgeon.full_name %>, <%= @surgeon.suffix %>
+	<!-- <a href="#" src="#" onclick="download_pdf();" style="float: right;" >Export as PDF</a> -->
+	<%= link_to 'Export as PDF', generate_report_path(search_id: params[:search_id], surgeon_id: params[:surgeon_id], format: :pdf) %> 
+
+	</h3>
+
+</div>
+<div class="flex flex-wrap" style="clear: left;float: left;width: 50%;">
+<%= bar_chart @results_25 %>
+<% sum = 0 %>
+<% @results_25.each do |res| %> 
+<% sum += res[1] %>
+<% end %>
+Total searches in 25 Mile Radius: <%= sum %>
+</div>
+
+<div class="flex flex-wrap" style="float: right;width: 50%;padding-left:2.5em">
+<%= bar_chart @results_50 %>
+<% sum = 0 %>
+<% @results_50.each do |res| %> 
+<% sum += res[1] %>
+<% end %>
+Total searches in 25-50 Mile Radius: <%= sum %>
+</div>
+
+<div style="clear:left; float: left; width: 50%;">
+<div style="width: 100%">
+	<h2>Searches You Appear In:</h2>
+	<table class="table-fixed">
+		<thead>
+		<tr>
+			<th class="w-1/2 px-4 py-2"></th>
+			<th class="w-1/2 px-4 py-2">Cervical</th>
+			<th class="w-1/2 px-4 py-2">Lumbar</th>
+		</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="border px-4 py-2">Fusion</td>
+				<td class="border px-4 py-2"><% if @procedure_types.include? "Cervical Fusion" %>Yes<% else %>No<% end %></td>
+				<td class="border px-4 py-2"><% if @procedure_types.include? "Lumbar Fusion" %>Yes<% else %>No<% end %></td>
+			</tr>
+			<tr>
+				<td class="border px-4 py-2">Motion</td>
+				<td class="border px-4 py-2"><% if @procedure_types.include? "Cervical Motion" %>Yes<% else %>No<% end %></td>
+				<td class="border px-4 py-2"><% if @procedure_types.include? "Lumbar Motion" %>Yes<% else %>No<% end %></td>
+			</tr>
+			<tr>
+				<td class="border px-4 py-2">Comprehensive Care</td>
+				<td class="border px-4 py-2"><% if @procedure_types.include? "Comprehensive Care Cervical" %>Yes<% else %>No<% end %></td>
+				<td class="border px-4 py-2"><% if @procedure_types.include? "Comprehensive Care Lumbar" %>Yes<% else %>No<% end %></td>
+			</tr>
+	</tbody>
+	</table>
+</div>
+<div style="width: 100%">
+	<h2>Nation Wide Searches:</h2>
+	<table class="table-fixed">
+		<thead>
+		<tr>
+			<th class="w-1/2 px-4 py-2"></th>
+			<th class="w-1/2 px-4 py-2">Cervical</th>
+			<th class="w-1/2 px-4 py-2">Lumbar</th>
+			<th class="w-1/2 px-4 py-2">Total</th>
+		</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="border px-4 py-2">Fusion</td>
+				<td class="border px-4 py-2"><% @cervical_fusion = (@surgeons_cervical_fusion*100)/(@total_surgeons) %><%= number_to_percentage(@cervical_fusion, precision: 0) %></td>
+				<td class="border px-4 py-2"><% @lumbar_fusion = (@surgeons_lumbar_fusion*100)/(@total_surgeons) %><%= number_to_percentage(@lumbar_fusion, precision: 0) %></td>
+				<td class="border px-4 py-2"><% @total_fusion = @cervical_fusion + @lumbar_fusion %><%= number_to_percentage(@total_fusion, precision: 0)%></td>
+			</tr>
+			<tr>
+				<td class="border px-4 py-2">Motion</td>
+				<td class="border px-4 py-2"><% @cervical_motion = (@surgeons_cervical_motion*100)/(@total_surgeons) %><%= number_to_percentage(@cervical_motion, precision: 0) %></td>
+				<td class="border px-4 py-2"><% @lumbar_motion = (@surgeons_lumbar_motion*100)/(@total_surgeons) %><%= number_to_percentage(@lumbar_motion, precision: 0) %></td>
+				<td class="border px-4 py-2"><% @total_motion = @cervical_motion + @lumbar_motion %><%= number_to_percentage(@total_motion, precision: 0)%></td>
+			</tr>
+			<tr>
+				<td class="border px-4 py-2">Comprehensive Care</td>
+				<td class="border px-4 py-2"><% @cc_cervical = (@surgeons_cc_cervical*100)/(@total_surgeons) %><%= number_to_percentage(@cc_cervical, precision: 0) %></td>
+				<td class="border px-4 py-2"><% @cc_lumbar = (@surgeons_cc_lumbar*100)/(@total_surgeons) %><%= number_to_percentage(@cc_lumbar, precision: 0) %></td>
+				<td class="border px-4 py-2"><% @total_cc = @cc_cervical + @cc_lumbar %><%= number_to_percentage(@total_cc, precision: 0)%></td>
+			</tr>
+			<tr>
+				<td class="border px-4 py-2">Total</td>
+				<td class="border px-4 py-2"><% @total_cervical = @cervical_fusion + @cervical_motion + @cc_cervical %><%= number_to_percentage(@total_cervical, precision: 0)%></td>
+				<td class="border px-4 py-2"><% @total_lumbar = @lumbar_fusion + @lumbar_motion + @cc_lumbar %><%= number_to_percentage(@total_lumbar, precision: 0)%></td>
+				<td class="border px-4 py-2"></td>
+			</tr>
+	</tbody>
+	</table>
+</div>
+</div>
+<div style="float: left; width: 50%;padding-left: 2.5em;">
+	<%= render 'heat_map' %>
+</div>
+<script>
+	function download_pdf() {
+		alert("Export Pdf");
+	}
+</script>

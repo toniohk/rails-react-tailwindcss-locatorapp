@@ -1,0 +1,43 @@
+wb = xlsx_package.workbook
+
+wb.add_worksheet(name: "Users") do |sheet|
+  sheet.add_row ["id", "email", "role", "reset_password_token", "reset_password_sent_at", "remember_created_at", "created_at", "updated_at", "invitation_token", "invitation_created_at", "invitation_sent_at", "invitation_accepted_at", "invitation_limit", "invited_by_type", "invited_by_id", "invitations_count" ]
+  @users.each do |user|
+    sheet.add_row [user.id, user.email, user.role, user.reset_password_token, user.reset_password_sent_at, user.remember_created_at, user.created_at, user.updated_at, user.invitation_token, user.invitation_created_at, user.invitation_sent_at, user.invitation_accepted_at, user.invitation_limit, user.invited_by_type, user.invited_by_id, user.invitations_count ]
+  end
+end
+
+wb.add_worksheet(name: "Locations") do |sheet|
+  sheet.add_row ["id", "name", "address_1", "address_2", "city", "state", "zip", "country", "phone_number", "fax_number", "user_id", "status", "latitude", "longitude", "website", "created_at", "updated_at"]
+  @locations.each do |location|
+    sheet.add_row [location.id, location.name, location.address_1, location.address_2, location.city, location.state, location.zip, location.country, location.phone_number, location.fax_number, location.user_id, location.status, location.latitude, location.longitude, location.website, location.created_at, location.updated_at]
+  end
+end
+
+wb.add_worksheet(name: "Surgeons") do |sheet|
+  sheet.add_row ["id", "full_name", "email", "url", "phone", "suffix", "location_id", "status", "procedure_types_array", "created_at", "updated_at"]
+  @surgeons.each do |surgeon|
+    sheet.add_row [surgeon.id, surgeon.full_name, surgeon.email, surgeon.url, surgeon.phone, surgeon.suffix, surgeon.location_id, surgeon.status, surgeon.procedure_types_array, surgeon.created_at, surgeon.updated_at]
+  end
+end
+
+wb.add_worksheet(name: "Searches") do |sheet|
+  sheet.add_row ["id", "search_radius", "procedure_type", "zip", "created_at", "updated_at"]
+  @searches.each do |search|
+    sheet.add_row [search.id, search.search_radius, search.procedure_type, search.zip, search.created_at, search.updated_at]
+  end
+end
+
+wb.add_worksheet(name: "Search Results") do |sheet|
+  sheet.add_row ["id", "search_id", "surgeon_id", "created_at", "updated_at"]
+  @search_results.each do |search_result|
+    sheet.add_row [search_result.id, search_result.search_id, search_result.surgeon_id, search_result.created_at, search_result.updated_at]
+  end
+end
+
+wb.add_worksheet(name: "Links") do |sheet|
+  sheet.add_row ["id", "search_id", "surgeon_id", "link_type", "created_at", "updated_at"]
+  @links.each do |link|
+    sheet.add_row [link.id, link.search_id, link.surgeon_id, link.link_type, link.created_at, link.updated_at]
+  end
+end

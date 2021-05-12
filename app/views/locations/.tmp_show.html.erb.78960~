@@ -1,0 +1,3 @@
+<%= @article.text %>
+<%= @article.title %>
+<%= link_to "Edit me", edit_article_path(@article.id) %>

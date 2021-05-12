@@ -1,0 +1,156 @@
+<div class="ent cnt-ent">
+    <div class="logo-pdf">
+        <div class="fl-left pad-10">
+            rediscovermylife.org Locator Impact Report<h3 class="font-bold pl-2">Client specific report</h3>
+        </div>
+        <div class="fl-right pad-10">
+            <img src="/assets/logo_rediscover.png" class="wd-330"/>
+        </div>
+    </div>
+    <div class="gryBk frq-res ht-450 brdr-dv">
+        <h2 class="pad-10">Most frequently requested Zip codes
+            <br/>
+            (Top 10 results)
+        </h2>
+        <% if @zip_codes && @zip_codes != "" %>
+        <table class="wd-75 mar-10">
+            <thead>
+                <tr>
+                    <th class="pd">
+                        Zip Code
+                    </th>
+                    <th class="pd">
+                        No. of searches
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @zip_codes.each do |search_result| %>
+                <tr>
+                    <td class="border pd">
+                        <%= search_result.searched_zip %>
+                    </td>
+                    <td class="border pd">
+                        <%= search_result.count_zip %>
+                    </td>
+                </tr>
+                <% end %>
+            </tbody>
+        </table>
+        <% else %>
+        <p class="pad-10">
+            No results!
+        </p>
+        <% end %>
+    </div>
+    <div class="ent_nofl gryBk frq-zip ht-450 brdr-btm">
+        <h2 class="pad-10">Area Searches:</h2>
+        <table class="wd-80">
+            <thead>
+                <tr>
+                    <th class="w-1/2 px-4 py-2">
+                    </th>
+                    <th class="w-1/2 px-4 py-2">
+                        Cervical
+                    </th>
+                    <th class="w-1/2 px-4 py-2">
+                        Lumbar
+                    </th>
+                    <th class="w-1/2 px-4 py-2">
+                        Total
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="px-4 py-2">
+                        Fusion
+                    </td>
+                    <td class="border padng-ls"><% @cervical_fusion_c = (@cervical_fusion_count.to_f*100)/(@total_search_count).to_f %><%= number_to_percentage(@cervical_fusion_c, precision: 2) %></td> 
+                    <td class="border padng-ls"><% @lumbar_fusion_c = (@lumbar_fusion_count*100)/(@total_search_count).to_f %><%= number_to_percentage(@lumbar_fusion_c, precision: 2) %></td> 
+                    <td class="border padng-ls"><% @total_fusion_c = @lumbar_fusion_c + @cervical_fusion_c %><%= number_to_percentage(@total_fusion_c, precision: 2)%>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2">
+                        Motion
+                    </td>
+                    <td class="border padng-ls"><% @cervical_motion_c = (@cervical_motion_count*100)/(@total_search_count).to_f %><%= number_to_percentage(@cervical_motion_c, precision: 2) %></td>
+
+                    <td class="border padng-ls"><% @lumbar_motion_c = (@lumbar_motion_count*100)/(@total_search_count).to_f %><%= number_to_percentage(@lumbar_motion_c, precision: 2) %></td>
+                    <td class="border padng-ls"><% @total_motion_c = @lumbar_motion_c + @cervical_motion_c %><%= number_to_percentage(@total_motion_c, precision: 2)%></td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2">
+                        Comprehensive Care
+                    </td>
+                    <td class="border padng-ls"><% @cc_cervical_c = (@cc_fusion_count*100)/(@total_search_count).to_f %><%= number_to_percentage(@cc_cervical_c, precision: 2) %></td>
+                    <td class="border padng-ls"><% @cc_lumbar_c = (@cc_motion_count*100)/(@total_search_count).to_f %><%= number_to_percentage(@cc_lumbar_c, precision: 2) %></td>
+                    <td class="border padng-ls"><% @total_cc = @cc_cervical_c + @cc_lumbar_c %><%= number_to_percentage(@total_cc, precision: 2)%></td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2">
+                        Total
+                    </td>
+                    <td class="border padng-ls"><% @total_cervical_c = @cervical_fusion_c + @cervical_motion_c + @cc_cervical_c %><%= number_to_percentage(@total_cervical_c, precision: 2)%></td>
+
+                    <td class="border padng-ls"><% @total_lumbar_c = @lumbar_fusion_c + @lumbar_motion_c + @cc_lumbar_c %><%= number_to_percentage(@total_lumbar_c, precision: 2)%></td>
+                    <td class="padng-ls"></td> 
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="gryBk nat-srch brdr-rt">
+        <h2 class="pad-10">Most frequently clicked Doctors:
+            <br/>
+            (Top 5 results)
+        </h2>
+        <% if @searched_surgeons && @searched_surgeons != "" %>
+        <table class="tbl-frq">
+            <thead>
+                <tr>
+                    <th class="">
+                        Name
+                    </th>
+                    <th class="">
+                        Website, Phone
+                    </th>
+                    <th class="">
+                        Clicks
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @searched_surgeons.each do |search_result| %>
+                <tr>
+                    <td class="border">
+                        <%= search_result.full_name %>
+                    </td>
+                    <td class="border">
+                        <% if search_result.url && search_result.url != "" %>
+							Website: <%= search_result.url %><br />
+						<% end %>
+						<% if search_result.phone_number && search_result.phone_number != "" %>
+							Phone: <%= search_result.phone_number %>
+						<% end %>
+                    </td>
+                    <td class="border">
+                        <%= search_result.count %>
+                    </td>
+                </tr>
+                <% end %>
+            </tbody>
+        </table>
+        <% else %>
+        <p class="pad-10">
+            No results!
+        </p>
+        <% end %>
+    </div>
+    <div class="gryBk ht-550 dv-map">
+        <p class="wid mar-10">
+            Heat Map:
+        </p>
+        <%= render 'heat_map' %>
+    </div>
+</div>

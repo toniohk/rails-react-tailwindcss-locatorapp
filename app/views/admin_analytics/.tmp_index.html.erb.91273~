@@ -1,0 +1,62 @@
+<div class="bg-blue-800 p-2 shadow text-xl text-white">
+    <h3 class="font-bold pl-2">Analytics</h3>
+</div>
+<% if flash[:notice] %>
+<div class="notice">
+    <%= flash[:notice] %>
+</div>
+<% end %>
+<% if @searches && @searches.length > 0 %>
+<table class="table-fixed">
+    <thead>
+        <tr>
+            <th class="w-1/2 px-4 py-2">
+                Zip Code
+            </th>
+            <th class="w-1/2 px-4 py-2">
+                Search Radius
+            </th>
+            <th class="w-1/2 px-4 py-2">
+                Procedure Types
+            </th>
+            <th class="w-1/2 px-4 py-2">
+                Area of Discomfort
+            </th>
+            <th class="w-1/2 px-4 py-2">
+            	Results
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <% @searches.each do |result| %>
+        <tr>
+            <td class="border px-4 py-2">
+                <%= result.zip %>
+            </td>
+            <td class="border px-4 py-2">
+                <%= result.search_radius %>
+            </td>
+            <td class="border px-4 py-2">
+                <%= result.procedure_types %>
+            </td>
+            <td class="border px-4 py-2">
+                <%= result.area_of_discomfort %>
+            </td>
+            <td class="border px-4 py-2">
+				<%= link_to 'Search Results', search_results_path(id: result.id), style: "text-decoration: underline;"  %>
+            </td>
+        </tr>
+        <% end %>
+    </tbody>
+</table>
+<div class="digg_pagination">
+    <div class="page_info">
+        <%= page_entries_info @searches %>
+    </div>
+    <%= will_paginate @searches, :container => false %>
+</div>
+<% else %>
+<p>
+    There are are no user searches done yet!
+</p>
+<% end %>

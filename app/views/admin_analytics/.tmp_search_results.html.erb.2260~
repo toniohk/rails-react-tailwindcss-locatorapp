@@ -1,0 +1,86 @@
+<div class="bg-blue-800 p-2 shadow text-xl text-white">
+    <h3 class="font-bold pl-2">Search Results for: <%= @search.zip %>, <%= @search.search_radius %> Radius, <%= @search.procedure_types %> and User discomfort - <%= @search.area_of_discomfort %> </h3>
+</div>
+<% if flash[:notice] %>
+<div class="notice">
+    <%= flash[:notice] %>
+</div>
+<% end %>
+<% if @search_results && @search_results.length > 0 %>
+<table class="table-fixed">
+    <thead>
+        <tr>
+            <th class="w-1/2 px-4 py-2">
+                Surgeon Name, Professional_Suffix
+            </th>
+            <th class="w-1/2 px-4 py-2">
+                Website Url
+            </th>
+            <th class="w-1/2 px-4 py-2">
+                Procedure Types
+            </th>
+            <th class="w-1/2 px-4 py-2">
+                Location Name
+            </th>
+            <th class="w-1/2 px-4 py-2">
+            	Address
+            </th>
+			<th class="w-1/2 px-4 py-2">
+            	City, State
+            </th>
+			<th class="w-1/2 px-4 py-2">
+            	Any clicks?
+            </th>
+			<th class="w-1/2 px-4 py-2">
+            	Generate Report
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <% @search_results.each do |result| %>
+		<% surgeon = result.surgeon %>
+		<% location = surgeon.location %>
+		<% search = result.search %>
+		<% links = Link.where(search_id: search.id, surgeon_id: surgeon.id) %>
+        <tr>
+            <td class="border px-4 py-2">
+                <%= "#{surgeon.full_name}, #{surgeon.suffix}" %>
+            </td>
+            <td class="border px-4 py-2">
+                <%= surgeon.url %>
+            </td>
+            <td class="border px-4 py-2">
+                <%= surgeon.procedure_types %>
+            </td>
+			<td class="border px-4 py-2">
+                <%= location.name %>
+            </td>
+            <td class="border px-4 py-2">
+                <%= "#{location.address_1}, #{location.address_2}" %>
+            </td>
+			<td class="border px-4 py-2">
+                <%= "#{location.city}, #{location.state}" %>
+            </td>
+			<td class="border px-4 py-2">
+				<% if ( links && links.length > 0 ) %>Website is tracked <%= links.length %> times. <% else %> No clicks on this website! <% end %>
+            </td>
+            <td class="border px-4 py-2">
+				<%= link_to 'Generate Report', generate_report_path(search_id: @search.id, surgeon_id: surgeon.id), class: "hover:border-pink-500"  %>
+            </td>
+			
+
+        </tr>
+        <% end %>
+    </tbody>
+</table>
+<div class="digg_pagination">
+    <div class="page_info">
+        <%= page_entries_info @search_results %>
+    </div>
+    <%= will_paginate @search_results, :container => false %>
+</div>
+<% else %>
+<p>
+    There are are no user searches done yet!
+</p>
+<% end %>
